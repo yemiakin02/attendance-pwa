@@ -18,7 +18,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Attendance System" />
   
-  <!-- ✅ ENHANCED STYLES -->
   <style>
     * {
       margin: 0;
@@ -26,496 +25,692 @@
       box-sizing: border-box;
     }
 
-    html, body {
-      height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
       color: #333;
-      overflow: hidden;
     }
 
-    .container {
+    .app-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ✅ HEADER */
+    .header {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    .app-title {
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .install-btn {
+      background: #d32f2f;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: none;
+    }
+
+    /* ✅ MAIN CONTENT */
+    .main-content {
+      flex: 1;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      text-align: center;
-      padding: 20px;
-      position: relative;
     }
 
-    .logo {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      margin-bottom: 30px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      transition: transform 0.3s ease;
-      animation: fadeInUp 1s ease-out;
-    }
-
-    .logo:hover {
-      transform: scale(1.05);
-    }
-
-    .title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: white;
-      margin-bottom: 10px;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      animation: fadeInUp 1s ease-out 0.2s both;
-    }
-
-    .subtitle {
-      font-size: 1.2rem;
-      color: rgba(255,255,255,0.9);
-      margin-bottom: 40px;
-      animation: fadeInUp 1s ease-out 0.4s both;
-    }
-
-    .loading-container {
+    .welcome-card {
       background: rgba(255,255,255,0.15);
       backdrop-filter: blur(10px);
       border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      animation: fadeInUp 1s ease-out 0.6s both;
-      min-width: 300px;
-    }
-
-    .progress-bar {
-      width: 100%;
-      height: 6px;
-      background: rgba(255,255,255,0.3);
-      border-radius: 3px;
-      overflow: hidden;
-      margin: 20px 0;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
-      background-size: 200% 100%;
-      border-radius: 3px;
-      animation: progressAnimation 2s ease-in-out infinite, gradientShift 3s ease-in-out infinite;
-      width: 0%;
-    }
-
-    .status-text {
-      color: white;
-      font-size: 1rem;
-      margin-top: 15px;
-      opacity: 0.9;
-    }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 15px;
-      margin-top: 30px;
-      max-width: 500px;
-    }
-
-    .feature {
-      background: rgba(255,255,255,0.1);
-      border-radius: 15px;
-      padding: 15px;
+      padding: 40px;
       text-align: center;
       border: 1px solid rgba(255,255,255,0.2);
-      transition: all 0.3s ease;
+      max-width: 500px;
+      width: 100%;
+      margin-bottom: 30px;
     }
 
-    .feature:hover {
-      background: rgba(255,255,255,0.2);
-      transform: translateY(-2px);
-    }
-
-    .feature-icon {
-      font-size: 2rem;
-      margin-bottom: 8px;
+    .welcome-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin: 0 auto 20px;
       display: block;
     }
 
-    .feature-text {
+    .welcome-title {
       color: white;
-      font-size: 0.9rem;
-      font-weight: 500;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
     }
 
-    /* ✅ PWA INSTALL BUTTON */
-    .install-button {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background: #d32f2f;
+    .welcome-subtitle {
+      color: rgba(255,255,255,0.9);
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+    }
+
+    .action-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .action-btn {
+      background: rgba(255,255,255,0.2);
       color: white;
       border: none;
-      border-radius: 50px;
-      padding: 15px 25px;
+      padding: 20px;
+      border-radius: 15px;
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 4px 20px rgba(211, 47, 47, 0.4);
       transition: all 0.3s ease;
-      z-index: 1000;
-      display: none;
-      animation: pulse 2s infinite;
+      border: 1px solid rgba(255,255,255,0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
     }
 
-    .install-button:hover {
-      background: #b71c1c;
+    .action-btn:hover {
+      background: rgba(255,255,255,0.3);
       transform: translateY(-2px);
-      box-shadow: 0 6px 25px rgba(211, 47, 47, 0.6);
     }
 
-    .install-button:active {
-      transform: translateY(0);
+    .action-icon {
+      font-size: 2rem;
     }
 
     /* ✅ STATUS INDICATOR */
-    .status-indicator {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255,255,255,0.9);
-      color: #333;
+    .status-bar {
+      background: rgba(255,255,255,0.1);
       padding: 10px 20px;
-      border-radius: 25px;
+      text-align: center;
+      color: white;
       font-size: 0.9rem;
-      font-weight: 500;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .status-online { background: #4caf50; }
+    .status-offline { background: #f44336; }
+    .status-loading { background: #ff9800; animation: pulse 1s infinite; }
+
+    /* ✅ LOADING OVERLAY */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(103, 126, 234, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       z-index: 1000;
       opacity: 0;
+      visibility: hidden;
       transition: all 0.3s ease;
     }
 
-    .status-indicator.show {
+    .loading-overlay.show {
       opacity: 1;
+      visibility: visible;
     }
 
-    .status-indicator.success { background: #4caf50; color: white; }
-    .status-indicator.error { background: #f44336; color: white; }
-    .status-indicator.warning { background: #ff9800; color: white; }
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    .loading-text {
+      color: white;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+
+    /* ✅ MODAL FOR FORMS */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      padding: 20px;
+    }
+
+    .modal.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .modal-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #666;
+      padding: 5px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e1e5e9;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #d32f2f;
+    }
+
+    .submit-btn {
+      background: #d32f2f;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.3s ease;
+    }
+
+    .submit-btn:hover {
+      background: #b71c1c;
+    }
+
+    .submit-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
 
     /* ✅ ANIMATIONS */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes progressAnimation {
-      0% { width: 0%; }
-      50% { width: 70%; }
-      100% { width: 100%; }
-    }
-
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     @keyframes pulse {
-      0% { box-shadow: 0 4px 20px rgba(211, 47, 47, 0.4); }
-      50% { box-shadow: 0 4px 30px rgba(211, 47, 47, 0.8); }
-      100% { box-shadow: 0 4px 20px rgba(211, 47, 47, 0.4); }
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
 
-    /* ✅ RESPONSIVE DESIGN */
+    /* ✅ RESPONSIVE */
     @media (max-width: 768px) {
-      .title { font-size: 2rem; }
-      .subtitle { font-size: 1rem; }
-      .loading-container { padding: 20px; min-width: 280px; }
-      .install-button { bottom: 20px; right: 20px; padding: 12px 20px; }
-      .features { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .feature { padding: 12px; }
+      .header {
+        padding: 12px 15px;
+      }
+      
+      .welcome-card {
+        padding: 30px 20px;
+        margin: 0 10px 20px;
+      }
+      
+      .welcome-title {
+        font-size: 1.8rem;
+      }
+      
+      .action-buttons {
+        grid-template-columns: 1fr;
+      }
+      
+      .modal-content {
+        padding: 20px;
+        margin: 10px;
+      }
     }
 
-    @media (max-width: 480px) {
-      .title { font-size: 1.8rem; }
-      .logo { width: 100px; height: 100px; }
-      .loading-container { margin: 0 10px; }
-    }
-
-    /* ✅ PWA SPECIFIC STYLES */
     @media (display-mode: standalone) {
-      .container {
-        padding-top: 40px; /* Account for status bar */
+      .install-btn {
+        display: none !important;
+      }
+      
+      .header {
+        padding-top: 20px; /* Account for status bar */
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <img src="logo.png" alt="Attendance Logo" class="logo" />
-    <h1 class="title">Attendance System</h1>
-    <p class="subtitle">Sanctuary Keeper Unit - Winnipeg</p>
-    
-    <div class="loading-container">
-      <div class="progress-bar">
-        <div class="progress-fill"></div>
+  <div class="app-container">
+    <!-- ✅ HEADER -->
+    <header class="header">
+      <div class="logo-container">
+        <img src="logo.png" alt="Logo" class="logo" />
+        <span class="app-title">Attendance System</span>
       </div>
-      <p class="status-text" id="status-text">Initializing PWA...</p>
-      
-      <div class="features">
-        <div class="feature">
-          <span class="feature-icon">📱</span>
-          <span class="feature-text">Install as App</span>
-        </div>
-        <div class="feature">
-          <span class="feature-icon">🔒</span>
-          <span class="feature-text">Secure Access</span>
-        </div>
-        <div class="feature">
-          <span class="feature-icon">⚡</span>
-          <span class="feature-text">Fast Loading</span>
-        </div>
-        <div class="feature">
-          <span class="feature-icon">📊</span>
-          <span class="feature-text">Real-time Data</span>
+      <button class="install-btn" id="install-btn">📱 Install</button>
+    </header>
+
+    <!-- ✅ MAIN CONTENT -->
+    <main class="main-content">
+      <div class="welcome-card">
+        <img src="logo.png" alt="Logo" class="welcome-logo" />
+        <h1 class="welcome-title">Welcome!</h1>
+        <p class="welcome-subtitle">Sanctuary Keeper Unit - Winnipeg</p>
+        
+        <div class="action-buttons">
+          <button class="action-btn" onclick="showLoginModal()">
+            <span class="action-icon">🔐</span>
+            <span>Login / Register</span>
+          </button>
+          
+          <button class="action-btn" onclick="showSubmitModal()">
+            <span class="action-icon">📝</span>
+            <span>Submit Attendance</span>
+          </button>
+          
+          <button class="action-btn" onclick="showAdminModal()">
+            <span class="action-icon">⚙️</span>
+            <span>Admin Panel</span>
+          </button>
+          
+          <button class="action-btn" onclick="openWebVersion()">
+            <span class="action-icon">🌐</span>
+            <span>Full Web Version</span>
+          </button>
         </div>
       </div>
+    </main>
+
+    <!-- ✅ STATUS BAR -->
+    <div class="status-bar">
+      <span class="status-indicator status-online" id="status-indicator"></span>
+      <span id="status-text">Ready</span>
     </div>
   </div>
 
-  <!-- ✅ PWA INSTALL BUTTON -->
-  <button class="install-button" id="install-button">
-    📱 Install App
-  </button>
+  <!-- ✅ LOADING OVERLAY -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loading-text">Loading...</div>
+  </div>
 
-  <!-- ✅ STATUS INDICATOR -->
-  <div class="status-indicator" id="status-indicator"></div>
+  <!-- ✅ LOGIN MODAL -->
+  <div class="modal" id="login-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Login / Register</h2>
+        <button class="close-btn" onclick="closeModal('login-modal')">&times;</button>
+      </div>
+      
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" class="form-input" id="phone-input" placeholder="Enter your phone number" required />
+        </div>
+        
+        <button type="submit" class="submit-btn" id="login-submit">Continue</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ✅ SUBMIT ATTENDANCE MODAL -->
+  <div class="modal" id="submit-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Submit Attendance</h2>
+        <button class="close-btn" onclick="closeModal('submit-modal')">&times;</button>
+      </div>
+      
+      <form onsubmit="handleSubmitAttendance(event)">
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" class="form-input" id="submit-phone" placeholder="Your phone number" required />
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Cleaning Day</label>
+          <select class="form-input" id="cleaning-day" required>
+            <option value="">Select cleaning day</option>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday</option>
+            <option value="Sunday">Sunday</option>
+          </select>
+        </div>
+        
+        <button type="submit" class="submit-btn" id="submit-attendance-btn">Submit Attendance</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ✅ ADMIN MODAL -->
+  <div class="modal" id="admin-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Admin Access</h2>
+        <button class="close-btn" onclick="closeModal('admin-modal')">&times;</button>
+      </div>
+      
+      <form onsubmit="handleAdminLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Admin Phone</label>
+          <input type="tel" class="form-input" id="admin-phone" placeholder="Admin phone number" required />
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">OTP Code</label>
+          <input type="text" class="form-input" id="admin-otp" placeholder="6-digit OTP" maxlength="6" />
+        </div>
+        
+        <button type="submit" class="submit-btn" id="admin-submit">Access Admin Panel</button>
+      </form>
+    </div>
+  </div>
 
   <script>
-    // ✅ COMPREHENSIVE PWA SCRIPT
-    console.log('🚀 Starting Complete PWA System...');
+    console.log('🚀 Standalone PWA App Starting...');
 
     let deferredPrompt = null;
-    let swRegistration = null;
-    
-    const statusText = document.getElementById('status-text');
-    const installButton = document.getElementById('install-button');
-    const statusIndicator = document.getElementById('status-indicator');
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyp3FBNJ4QNn9T20SrFS0x1aWYC6yotrJBLm9yPiF7Gao5z_3QgLGG66n0eog0i44xsdA/exec";
 
-    // ✅ STATUS MANAGEMENT
-    function updateStatus(message, type = 'info') {
-      console.log(`📊 ${message}`);
-      statusText.textContent = message;
-      showStatusIndicator(message, type);
-    }
-
-    function showStatusIndicator(message, type = 'info') {
-      statusIndicator.textContent = message;
-      statusIndicator.className = `status-indicator show ${type}`;
-      
-      setTimeout(() => {
-        statusIndicator.classList.remove('show');
-      }, 3000);
-    }
-
-    // ✅ SERVICE WORKER REGISTRATION
-    async function registerServiceWorker() {
-      if (!('serviceWorker' in navigator)) {
-        console.warn('❌ Service Workers not supported');
-        updateStatus('Service Workers not supported', 'error');
-        return false;
-      }
-
-      try {
-        console.log('🔄 Registering Service Worker...');
-        updateStatus('Registering Service Worker...');
-
-        swRegistration = await navigator.serviceWorker.register('service-worker.js', {
-          scope: './'
-        });
-
-        console.log('✅ Service Worker registered:', swRegistration.scope);
-        updateStatus('Service Worker registered!', 'success');
-
-        // Listen for updates
-        swRegistration.addEventListener('updatefound', () => {
-          console.log('🔄 Service Worker update found');
-          updateStatus('New version available!', 'warning');
-        });
-
-        return true;
-      } catch (error) {
-        console.error('❌ Service Worker registration failed:', error);
-        updateStatus('Service Worker failed', 'error');
-        return false;
-      }
-    }
-
-    // ✅ PWA INSTALL PROMPT
+    // ✅ PWA INSTALLATION
     window.addEventListener('beforeinstallprompt', (e) => {
       console.log('📱 Install prompt available!');
       e.preventDefault();
       deferredPrompt = e;
-      showInstallButton();
-      updateStatus('App can be installed!', 'success');
+      document.getElementById('install-btn').style.display = 'block';
     });
 
     window.addEventListener('appinstalled', () => {
-      console.log('🎉 App installed successfully!');
-      hideInstallButton();
-      updateStatus('App installed successfully!', 'success');
+      console.log('🎉 App installed!');
+      document.getElementById('install-btn').style.display = 'none';
+      updateStatus('App installed successfully!', 'online');
       deferredPrompt = null;
     });
 
-    // ✅ INSTALL BUTTON FUNCTIONS
-    function showInstallButton() {
-      installButton.style.display = 'block';
-      installButton.onclick = async () => {
-        if (deferredPrompt) {
-          console.log('📱 Showing install prompt...');
-          deferredPrompt.prompt();
-          
-          const { outcome } = await deferredPrompt.userChoice;
-          console.log('📱 Install result:', outcome);
-          
-          if (outcome === 'accepted') {
-            updateStatus('Installing app...', 'success');
-          } else {
-            updateStatus('Installation cancelled', 'warning');
-          }
-          
-          deferredPrompt = null;
-          hideInstallButton();
-        }
-      };
-    }
-
-    function hideInstallButton() {
-      installButton.style.display = 'none';
-    }
-
-    // ✅ CHECK INSTALLATION STATUS
-    function checkInstallationStatus() {
-      if (window.matchMedia('(display-mode: standalone)').matches) {
-        console.log('📱 Running as installed PWA');
-        updateStatus('Running as installed app', 'success');
-        hideInstallButton();
-        return true;
-      } else if (window.navigator.standalone === true) {
-        console.log('📱 Running as iOS web app');
-        updateStatus('Running as iOS web app', 'success');
-        hideInstallButton();
-        return true;
+    document.getElementById('install-btn').addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log('Install result:', outcome);
+        deferredPrompt = null;
+        document.getElementById('install-btn').style.display = 'none';
       }
-      return false;
+    });
+
+    // ✅ SERVICE WORKER REGISTRATION
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => {
+          console.log('✅ Service Worker registered:', reg.scope);
+          updateStatus('PWA features enabled', 'online');
+        })
+        .catch(err => {
+          console.error('❌ Service Worker failed:', err);
+          updateStatus('Limited offline support', 'offline');
+        });
     }
 
-    // ✅ NETWORK STATUS MONITORING
+    // ✅ STATUS MANAGEMENT
+    function updateStatus(message, type = 'online') {
+      const indicator = document.getElementById('status-indicator');
+      const text = document.getElementById('status-text');
+      
+      indicator.className = `status-indicator status-${type}`;
+      text.textContent = message;
+      
+      console.log(`📊 Status: ${message}`);
+    }
+
+    // ✅ LOADING MANAGEMENT
+    function showLoading(message = 'Loading...') {
+      document.getElementById('loading-text').textContent = message;
+      document.getElementById('loading-overlay').classList.add('show');
+    }
+
+    function hideLoading() {
+      document.getElementById('loading-overlay').classList.remove('show');
+    }
+
+    // ✅ MODAL MANAGEMENT
+    function showModal(modalId) {
+      document.getElementById(modalId).classList.add('show');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('show');
+    }
+
+    function showLoginModal() {
+      showModal('login-modal');
+    }
+
+    function showSubmitModal() {
+      showModal('submit-modal');
+    }
+
+    function showAdminModal() {
+      showModal('admin-modal');
+    }
+
+    // ✅ FORM HANDLERS
+    async function handleLogin(event) {
+      event.preventDefault();
+      const phone = document.getElementById('phone-input').value;
+      
+      showLoading('Connecting to server...');
+      closeModal('login-modal');
+      
+      try {
+        // Call your Google Apps Script login function
+        const response = await callGASFunction('loginWithStatus', { phoneNumber: phone });
+        
+        if (response.success) {
+          updateStatus('Login successful!', 'online');
+          // Redirect to full web app with user session
+          window.location.href = `${GAS_URL}?phone=${encodeURIComponent(phone)}&action=login`;
+        } else {
+          updateStatus('Login failed - redirecting to register', 'offline');
+          // Redirect to registration
+          window.location.href = `${GAS_URL}?phone=${encodeURIComponent(phone)}&action=register`;
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        updateStatus('Connection error - opening web version', 'offline');
+        // Fallback to web version
+        openWebVersion();
+      }
+      
+      hideLoading();
+    }
+
+    async function handleSubmitAttendance(event) {
+      event.preventDefault();
+      const phone = document.getElementById('submit-phone').value;
+      const cleaningDay = document.getElementById('cleaning-day').value;
+      
+      showLoading('Submitting attendance...');
+      closeModal('submit-modal');
+      
+      try {
+        const response = await callGASFunction('submitUserAttendance_FB', {
+          phoneNumber: phone,
+          cleaningDay: cleaningDay
+        });
+        
+        if (response.success) {
+          updateStatus('Attendance submitted successfully!', 'online');
+          alert('✅ Attendance submitted successfully!');
+        } else {
+          updateStatus('Submission failed', 'offline');
+          alert('❌ Failed to submit attendance. Please try the web version.');
+          openWebVersion();
+        }
+      } catch (error) {
+        console.error('Submit error:', error);
+        updateStatus('Connection error', 'offline');
+        alert('❌ Connection error. Opening web version...');
+        openWebVersion();
+      }
+      
+      hideLoading();
+    }
+
+    async function handleAdminLogin(event) {
+      event.preventDefault();
+      const phone = document.getElementById('admin-phone').value;
+      const otp = document.getElementById('admin-otp').value;
+      
+      showLoading('Verifying admin access...');
+      closeModal('admin-modal');
+      
+      // Always redirect to web version for admin
+      window.location.href = `${GAS_URL}?phone=${encodeURIComponent(phone)}&otp=${encodeURIComponent(otp)}&action=admin`;
+    }
+
+    // ✅ GOOGLE APPS SCRIPT COMMUNICATION
+    async function callGASFunction(functionName, parameters) {
+      const url = `${GAS_URL}?action=${functionName}`;
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(parameters)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      return await response.json();
+    }
+
+    // ✅ OPEN FULL WEB VERSION
+    function openWebVersion() {
+      updateStatus('Opening full web version...', 'loading');
+      window.location.href = GAS_URL;
+    }
+
+    // ✅ NETWORK STATUS
     window.addEventListener('online', () => {
-      console.log('🌐 Network: Online');
-      updateStatus('Back online!', 'success');
+      updateStatus('Back online!', 'online');
     });
 
     window.addEventListener('offline', () => {
-      console.log('📵 Network: Offline');
-      updateStatus('Offline mode active', 'warning');
+      updateStatus('Offline mode', 'offline');
     });
 
-    // ✅ INITIALIZATION SEQUENCE
-    async function initializePWA() {
-      console.log('🚀 Initializing Complete PWA...');
-      updateStatus('Initializing PWA...');
-
-      try {
-        // Step 1: Check if already installed
-        if (checkInstallationStatus()) {
-          console.log('📱 App is running as PWA');
-        }
-
-        // Step 2: Register Service Worker
-        const swSuccess = await registerServiceWorker();
-        
-        if (swSuccess) {
-          updateStatus('PWA fully initialized!', 'success');
-          console.log('✅ PWA initialization complete');
-        } else {
-          updateStatus('PWA partially initialized', 'warning');
-        }
-
-        // Step 3: Wait for install prompt
-        setTimeout(() => {
-          if (!deferredPrompt && !checkInstallationStatus()) {
-            updateStatus('Use browser menu to install', 'info');
-          }
-        }, 3000);
-
-        // Step 4: Start redirect sequence
-        startRedirectSequence();
-
-      } catch (error) {
-        console.error('❌ PWA initialization failed:', error);
-        updateStatus('PWA initialization failed', 'error');
-        // Still try to redirect even if PWA fails
-        setTimeout(startRedirectSequence, 2000);
+    // ✅ CLOSE MODALS ON OUTSIDE CLICK
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal')) {
+        e.target.classList.remove('show');
       }
-    }
+    });
 
-    // ✅ REDIRECT TO GOOGLE APPS SCRIPT
-    function startRedirectSequence() {
-      console.log('🔄 Starting redirect sequence...');
-      updateStatus('Connecting to server...');
-      
-      // Show loading for a bit longer to let PWA settle
-      setTimeout(() => {
-        updateStatus('Redirecting to app...');
-        
-        setTimeout(() => {
-          console.log('🚀 Redirecting to Google Apps Script...');
-          window.location.href = "https://script.google.com/macros/s/AKfycbw9w9TdNkXubv4z_vPUpb9UKwaPSVkeel1C0lDkv8KfL13wsIGKFSqcU8iiK3-1oa9Zdw/exec";
-        }, 800);
-      }, 1500);
-    }
-
-    // ✅ PERFORMANCE MONITORING
-    function logPerformance() {
-      if ('performance' in window) {
-        const perfData = performance.getEntriesByType('navigation')[0];
-        const loadTime = perfData.loadEventEnd - perfData.loadEventStart;
-        console.log(`⚡ Page loaded in ${loadTime}ms`);
+    // ✅ KEYBOARD SHORTCUTS
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        // Close any open modal
+        document.querySelectorAll('.modal').forEach(modal => {
+          modal.classList.remove('show');
+        });
       }
-    }
-
-    // ✅ ERROR HANDLING
-    window.addEventListener('error', (e) => {
-      console.error('💥 Global error:', e.error);
-      updateStatus('An error occurred', 'error');
     });
 
-    window.addEventListener('unhandledrejection', (e) => {
-      console.error('💥 Unhandled promise rejection:', e.reason);
-      updateStatus('Connection issue detected', 'warning');
-    });
-
-    // ✅ START EVERYTHING
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('📄 DOM loaded, starting PWA...');
-      initializePWA();
-      logPerformance();
-    });
-
-    // ✅ FALLBACK - Start immediately if DOM already loaded
-    if (document.readyState !== 'loading') {
-      console.log('📄 DOM already ready, starting PWA...');
-      initializePWA();
-      logPerformance();
-    }
-
-    console.log('✅ PWA script loaded successfully');
+    // ✅ INITIALIZE
+    updateStatus('PWA Ready', 'online');
+    console.log('✅ Standalone PWA App Ready');
   </script>
 </body>
 </html>
