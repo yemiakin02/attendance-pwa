@@ -4,58 +4,518 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Attendance System</title>
-
-  <!-- PWA Manifest -->
+  
+  <!-- ✅ PWA MANIFEST -->
   <link rel="manifest" href="manifest.json" />
-
-  <!-- App Icons -->
+  
+  <!-- ✅ APP ICONS -->
   <link rel="icon" href="logo.png" type="image/png" />
   <link rel="apple-touch-icon" href="logo.png" />
-
-  <!-- Theme Color -->
+  
+  <!-- ✅ PWA META TAGS -->
   <meta name="theme-color" content="#d32f2f" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-
-  <!-- Styles -->
+  <meta name="apple-mobile-web-app-title" content="Attendance System" />
+  
+  <!-- ✅ ENHANCED STYLES -->
   <style>
-    html, body {
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
       height: 100%;
-      background: #fff;
-      font-family: Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      overflow: hidden;
+    }
+
+    .container {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      color: #333;
+      height: 100vh;
       text-align: center;
+      padding: 20px;
+      position: relative;
     }
-    img {
+
+    .logo {
       width: 120px;
-      margin-bottom: 20px;
+      height: 120px;
+      border-radius: 50%;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease;
+      animation: fadeInUp 1s ease-out;
     }
-    p {
-      font-size: 1.1rem;
+
+    .logo:hover {
+      transform: scale(1.05);
+    }
+
+    .title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      animation: fadeInUp 1s ease-out 0.2s both;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 40px;
+      animation: fadeInUp 1s ease-out 0.4s both;
+    }
+
+    .loading-container {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      animation: fadeInUp 1s ease-out 0.6s both;
+      min-width: 300px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+      background-size: 200% 100%;
+      border-radius: 3px;
+      animation: progressAnimation 2s ease-in-out infinite, gradientShift 3s ease-in-out infinite;
+      width: 0%;
+    }
+
+    .status-text {
+      color: white;
+      font-size: 1rem;
+      margin-top: 15px;
+      opacity: 0.9;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px;
+      margin-top: 30px;
+      max-width: 500px;
+    }
+
+    .feature {
+      background: rgba(255,255,255,0.1);
+      border-radius: 15px;
+      padding: 15px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .feature:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .feature-text {
+      color: white;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    /* ✅ PWA INSTALL BUTTON */
+    .install-button {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #d32f2f;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 15px 25px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(211, 47, 47, 0.4);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      display: none;
+      animation: pulse 2s infinite;
+    }
+
+    .install-button:hover {
+      background: #b71c1c;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(211, 47, 47, 0.6);
+    }
+
+    .install-button:active {
+      transform: translateY(0);
+    }
+
+    /* ✅ STATUS INDICATOR */
+    .status-indicator {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.9);
+      color: #333;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .status-indicator.show {
+      opacity: 1;
+    }
+
+    .status-indicator.success { background: #4caf50; color: white; }
+    .status-indicator.error { background: #f44336; color: white; }
+    .status-indicator.warning { background: #ff9800; color: white; }
+
+    /* ✅ ANIMATIONS */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes progressAnimation {
+      0% { width: 0%; }
+      50% { width: 70%; }
+      100% { width: 100%; }
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 4px 20px rgba(211, 47, 47, 0.4); }
+      50% { box-shadow: 0 4px 30px rgba(211, 47, 47, 0.8); }
+      100% { box-shadow: 0 4px 20px rgba(211, 47, 47, 0.4); }
+    }
+
+    /* ✅ RESPONSIVE DESIGN */
+    @media (max-width: 768px) {
+      .title { font-size: 2rem; }
+      .subtitle { font-size: 1rem; }
+      .loading-container { padding: 20px; min-width: 280px; }
+      .install-button { bottom: 20px; right: 20px; padding: 12px 20px; }
+      .features { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .feature { padding: 12px; }
+    }
+
+    @media (max-width: 480px) {
+      .title { font-size: 1.8rem; }
+      .logo { width: 100px; height: 100px; }
+      .loading-container { margin: 0 10px; }
+    }
+
+    /* ✅ PWA SPECIFIC STYLES */
+    @media (display-mode: standalone) {
+      .container {
+        padding-top: 40px; /* Account for status bar */
+      }
     }
   </style>
 </head>
 <body>
-  <img src="logo.png" alt="Attendance Logo" />
-  <p>Loading Attendance System... Please wait.</p>
+  <div class="container">
+    <img src="logo.png" alt="Attendance Logo" class="logo" />
+    <h1 class="title">Attendance System</h1>
+    <p class="subtitle">Sanctuary Keeper Unit - Winnipeg</p>
+    
+    <div class="loading-container">
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+      <p class="status-text" id="status-text">Initializing PWA...</p>
+      
+      <div class="features">
+        <div class="feature">
+          <span class="feature-icon">📱</span>
+          <span class="feature-text">Install as App</span>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">🔒</span>
+          <span class="feature-text">Secure Access</span>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">⚡</span>
+          <span class="feature-text">Fast Loading</span>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">📊</span>
+          <span class="feature-text">Real-time Data</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ PWA INSTALL BUTTON -->
+  <button class="install-button" id="install-button">
+    📱 Install App
+  </button>
+
+  <!-- ✅ STATUS INDICATOR -->
+  <div class="status-indicator" id="status-indicator"></div>
 
   <script>
-    // Register service worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('✅ Service Worker registered:', reg.scope))
-        .catch(err => console.error('❌ Service Worker registration failed:', err));
+    // ✅ COMPREHENSIVE PWA SCRIPT
+    console.log('🚀 Starting Complete PWA System...');
+
+    let deferredPrompt = null;
+    let swRegistration = null;
+    
+    const statusText = document.getElementById('status-text');
+    const installButton = document.getElementById('install-button');
+    const statusIndicator = document.getElementById('status-indicator');
+
+    // ✅ STATUS MANAGEMENT
+    function updateStatus(message, type = 'info') {
+      console.log(`📊 ${message}`);
+      statusText.textContent = message;
+      showStatusIndicator(message, type);
     }
 
-    // Redirect to Google Apps Script Web App
-    setTimeout(() => {
-      window.location.href = "https://script.google.com/macros/s/AKfycbw9w9TdNkXubv4z_vPUpb9UKwaPSVkeel1C0lDkv8KfL13wsIGKFSqcU8iiK3-1oa9Zdw/exec";
-    }, 1500); // 1.5 second delay
+    function showStatusIndicator(message, type = 'info') {
+      statusIndicator.textContent = message;
+      statusIndicator.className = `status-indicator show ${type}`;
+      
+      setTimeout(() => {
+        statusIndicator.classList.remove('show');
+      }, 3000);
+    }
+
+    // ✅ SERVICE WORKER REGISTRATION
+    async function registerServiceWorker() {
+      if (!('serviceWorker' in navigator)) {
+        console.warn('❌ Service Workers not supported');
+        updateStatus('Service Workers not supported', 'error');
+        return false;
+      }
+
+      try {
+        console.log('🔄 Registering Service Worker...');
+        updateStatus('Registering Service Worker...');
+
+        swRegistration = await navigator.serviceWorker.register('service-worker.js', {
+          scope: './'
+        });
+
+        console.log('✅ Service Worker registered:', swRegistration.scope);
+        updateStatus('Service Worker registered!', 'success');
+
+        // Listen for updates
+        swRegistration.addEventListener('updatefound', () => {
+          console.log('🔄 Service Worker update found');
+          updateStatus('New version available!', 'warning');
+        });
+
+        return true;
+      } catch (error) {
+        console.error('❌ Service Worker registration failed:', error);
+        updateStatus('Service Worker failed', 'error');
+        return false;
+      }
+    }
+
+    // ✅ PWA INSTALL PROMPT
+    window.addEventListener('beforeinstallprompt', (e) => {
+      console.log('📱 Install prompt available!');
+      e.preventDefault();
+      deferredPrompt = e;
+      showInstallButton();
+      updateStatus('App can be installed!', 'success');
+    });
+
+    window.addEventListener('appinstalled', () => {
+      console.log('🎉 App installed successfully!');
+      hideInstallButton();
+      updateStatus('App installed successfully!', 'success');
+      deferredPrompt = null;
+    });
+
+    // ✅ INSTALL BUTTON FUNCTIONS
+    function showInstallButton() {
+      installButton.style.display = 'block';
+      installButton.onclick = async () => {
+        if (deferredPrompt) {
+          console.log('📱 Showing install prompt...');
+          deferredPrompt.prompt();
+          
+          const { outcome } = await deferredPrompt.userChoice;
+          console.log('📱 Install result:', outcome);
+          
+          if (outcome === 'accepted') {
+            updateStatus('Installing app...', 'success');
+          } else {
+            updateStatus('Installation cancelled', 'warning');
+          }
+          
+          deferredPrompt = null;
+          hideInstallButton();
+        }
+      };
+    }
+
+    function hideInstallButton() {
+      installButton.style.display = 'none';
+    }
+
+    // ✅ CHECK INSTALLATION STATUS
+    function checkInstallationStatus() {
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('📱 Running as installed PWA');
+        updateStatus('Running as installed app', 'success');
+        hideInstallButton();
+        return true;
+      } else if (window.navigator.standalone === true) {
+        console.log('📱 Running as iOS web app');
+        updateStatus('Running as iOS web app', 'success');
+        hideInstallButton();
+        return true;
+      }
+      return false;
+    }
+
+    // ✅ NETWORK STATUS MONITORING
+    window.addEventListener('online', () => {
+      console.log('🌐 Network: Online');
+      updateStatus('Back online!', 'success');
+    });
+
+    window.addEventListener('offline', () => {
+      console.log('📵 Network: Offline');
+      updateStatus('Offline mode active', 'warning');
+    });
+
+    // ✅ INITIALIZATION SEQUENCE
+    async function initializePWA() {
+      console.log('🚀 Initializing Complete PWA...');
+      updateStatus('Initializing PWA...');
+
+      try {
+        // Step 1: Check if already installed
+        if (checkInstallationStatus()) {
+          console.log('📱 App is running as PWA');
+        }
+
+        // Step 2: Register Service Worker
+        const swSuccess = await registerServiceWorker();
+        
+        if (swSuccess) {
+          updateStatus('PWA fully initialized!', 'success');
+          console.log('✅ PWA initialization complete');
+        } else {
+          updateStatus('PWA partially initialized', 'warning');
+        }
+
+        // Step 3: Wait for install prompt
+        setTimeout(() => {
+          if (!deferredPrompt && !checkInstallationStatus()) {
+            updateStatus('Use browser menu to install', 'info');
+          }
+        }, 3000);
+
+        // Step 4: Start redirect sequence
+        startRedirectSequence();
+
+      } catch (error) {
+        console.error('❌ PWA initialization failed:', error);
+        updateStatus('PWA initialization failed', 'error');
+        // Still try to redirect even if PWA fails
+        setTimeout(startRedirectSequence, 2000);
+      }
+    }
+
+    // ✅ REDIRECT TO GOOGLE APPS SCRIPT
+    function startRedirectSequence() {
+      console.log('🔄 Starting redirect sequence...');
+      updateStatus('Connecting to server...');
+      
+      // Show loading for a bit longer to let PWA settle
+      setTimeout(() => {
+        updateStatus('Redirecting to app...');
+        
+        setTimeout(() => {
+          console.log('🚀 Redirecting to Google Apps Script...');
+          window.location.href = "https://script.google.com/macros/s/AKfycbw9w9TdNkXubv4z_vPUpb9UKwaPSVkeel1C0lDkv8KfL13wsIGKFSqcU8iiK3-1oa9Zdw/exec";
+        }, 800);
+      }, 1500);
+    }
+
+    // ✅ PERFORMANCE MONITORING
+    function logPerformance() {
+      if ('performance' in window) {
+        const perfData = performance.getEntriesByType('navigation')[0];
+        const loadTime = perfData.loadEventEnd - perfData.loadEventStart;
+        console.log(`⚡ Page loaded in ${loadTime}ms`);
+      }
+    }
+
+    // ✅ ERROR HANDLING
+    window.addEventListener('error', (e) => {
+      console.error('💥 Global error:', e.error);
+      updateStatus('An error occurred', 'error');
+    });
+
+    window.addEventListener('unhandledrejection', (e) => {
+      console.error('💥 Unhandled promise rejection:', e.reason);
+      updateStatus('Connection issue detected', 'warning');
+    });
+
+    // ✅ START EVERYTHING
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('📄 DOM loaded, starting PWA...');
+      initializePWA();
+      logPerformance();
+    });
+
+    // ✅ FALLBACK - Start immediately if DOM already loaded
+    if (document.readyState !== 'loading') {
+      console.log('📄 DOM already ready, starting PWA...');
+      initializePWA();
+      logPerformance();
+    }
+
+    console.log('✅ PWA script loaded successfully');
   </script>
 </body>
 </html>
