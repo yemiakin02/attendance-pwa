@@ -2,7 +2,7 @@
   "name": "Sanctuary Keeper Attendance System",
   "short_name": "Attendance",
   "description": "Winners Chapel International - Sanctuary Keeper Unit - Winnipeg, Canada",
-  "start_url": ".",
+  "start_url": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#667eea",
@@ -30,27 +30,26 @@
       "purpose": "maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "logo.png",
-      "sizes": "640x480",
-      "type": "image/png",
-      "form_factor": "wide"
-    }
-  ],
   "shortcuts": [
     {
-      "name": "Submit Attendance",
-      "short_name": "Submit",
-      "description": "Quick attendance submission",
-      "url": "/?action=submit",
+      "name": "Quick Login",
+      "short_name": "Login",
+      "description": "Quick login access",
+      "url": "./?action=login",
       "icons": [{ "src": "logo.png", "sizes": "96x96" }]
     },
     {
-      "name": "View Records", 
-      "short_name": "Records",
-      "description": "View attendance records",
-      "url": "/?action=records", 
+      "name": "Submit Attendance",
+      "short_name": "Submit",
+      "description": "Quick attendance submission", 
+      "url": "./?action=submit",
+      "icons": [{ "src": "logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Admin Panel",
+      "short_name": "Admin",
+      "description": "Administrative access",
+      "url": "./?action=admin",
       "icons": [{ "src": "logo.png", "sizes": "96x96" }]
     }
   ]
