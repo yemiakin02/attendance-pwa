@@ -1,2007 +1,462 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance System - PWA</title>
-    
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#d32f2f">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Attendance System">
-    
-    <!-- Icons -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23d32f2f'/><text x='50' y='60' text-anchor='middle' fill='white' font-size='40' font-family='Arial'>A</text></svg>" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23d32f2f'/><text x='50' y='60' text-anchor='middle' fill='white' font-size='40' font-family='Arial'>A</text></svg>">
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            font-size: 16px;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            overflow-x: hidden;
-        }
-
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-            padding: 40px 30px;
-            text-align: center;
-            position: relative;
-            margin: 0 auto 20px;
-            padding-top: 70px;
-        }
-        
-        .container.admin-wider-container {
-            max-width: 950px;
-        }
-
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-            width: 100%;
-        }
-
-        .title {
-            color: #2c5282;
-            font-size: clamp(1.8rem, 5vw, 2.5rem);
-            font-weight: bold;
-            margin-bottom: 40px;
-            letter-spacing: -1px;
-        }
-
-        .subtitle {
-            color: #4a5568;
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
-
-        .welcome-title {
-            color: #2c5282;
-            font-size: clamp(1.5rem, 4vw, 2rem);
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .welcome-name {
-            color: #2d3748;
-            font-size: clamp(1.2rem, 3.5vw, 1.5rem);
-            font-style: italic;
-            margin-bottom: 30px;
-        }
-
-        .phone-input-container {
-            position: relative;
-            margin-bottom: 30px;
-        }
-
-        .phone-input, .generic-input {
-            width: 100%;
-            padding: 15px 15px 15px 70px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        .generic-input {
-            padding-left: 15px;
-        }
-
-        .phone-input:focus, .generic-input:focus {
-            border-color: #4299e1;
-        }
-
-        .flag-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 40px;
-            height: 25px;
-            background: #ff0000;
-            border-radius: 3px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 0.8rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #4299e1 0%, #2c5282 100%);
-            color: white;
-            border: none;
-            padding: 18px 40px;
-            border-radius: 10px;
-            font-size: clamp(1rem, 3vw, 1.1rem);
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-bottom: 20px;
-        }
-
-        .btn-primary.small-margin {
-            margin-bottom: 10px;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(66, 153, 225, 0.3);
-        }
-
-        .btn-secondary-new {
-            background: #e2e8f0;
-            color: #2d3748;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: clamp(0.9rem, 2.8vw, 1rem);
-            cursor: pointer;
-            transition: background 0.3s;
-            width: 100%;
-            margin-bottom: 15px;
-        }
-
-        .btn-secondary-new:hover {
-            background: #cbd5e0;
-        }
-
-        .info-box {
-            background: #ebf8ff;
-            border: 2px solid #bee3f8;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: flex-start;
-            text-align: left;
-        }
-
-        .info-box.error {
-            background: #fff5f5;
-            border-color: #fecaca;
-        }
-
-        .info-box.error .info-icon {
-            background: #ef4444;
-        }
-
-        .info-box.error .info-content h3 {
-            color: #c53030;
-        }
-
-        .info-box.success {
-            background: #f0fff4;
-            border-color: #9ae6b4;
-        }
-
-        .info-box.success .info-icon {
-            background: #48bb78;
-        }
-
-        .info-box.success .info-content h3 {
-            color: #2f855a;
-        }
-
-        .info-icon {
-            background: #4299e1;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            flex-shrink: 0;
-            font-size: 1rem;
-        }
-
-        .info-content h3 {
-            color: #2c5282;
-            font-size: clamp(1rem, 3vw, 1.1rem);
-            margin-bottom: 8px;
-        }
-
-        .info-content p {
-            color: #4a5568;
-            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
-            line-height: 1.4;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-            text-align: left;
-        }
-
-        .form-label {
-            display: block;
-            color: #2d3748;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: clamp(0.9rem, 2.8vw, 1rem);
-        }
-
-        .form-select {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 1rem;
-            background: white;
-            cursor: pointer;
-            outline: none;
-            transition: border-color 0.3s;
-            color: #2d3748;
-        }
-
-        .form-select:focus {
-            border-color: #4299e1;
-        }
-
-        .birthday-select-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .birthday-select-group .form-select {
-            flex: 1;
-        }
-
-        .success-message-container {
-            background: #f0fff4;
-            border: 2px solid #9ae6b4;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 25px;
-            color: #22543d;
-        }
-
-        .success-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-
-        .bible-verse {
-            background: #fefcbf;
-            border-left: 4px solid #ecc94b;
-            padding: 20px;
-            margin: 25px 0;
-            border-radius: 0 10px 10px 0;
-            font-style: italic;
-            color: #744210;
-            text-align: left;
-        }
-
-        .verse-text {
-            font-size: clamp(0.9rem, 2.8vw, 1rem);
-            line-height: 1.5;
-            margin-bottom: 10px;
-        }
-
-        .verse-ref {
-            font-weight: bold;
-            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
-        }
-
-        .language-toggle {
-            position: absolute;
-            top: 25px;
-            left: 25px;
-            display: flex;
-            background: white;
-            border-radius: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            overflow: hidden;
-            z-index: 10;
-        }
-
-        .lang-btn {
-            padding: 8px 16px;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: all 0.3s;
-            color: #718096;
-        }
-
-        .lang-btn.active {
-            background: linear-gradient(135deg, #4299e1 0%, #2c5282 100%);
-            color: white;
-        }
-
-        .lang-btn:hover:not(.active) {
-            background: #f7fafc;
-            color: #4299e1;
-        }
-
-        .page-actions-icons {
-            display: flex;
-            justify-content: space-around;
-            align-items: flex-start;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
-            width: 100%;
-            max-width: 300px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .action-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: #2c5282;
-            cursor: pointer;
-            padding: 10px;
-            border-radius: 8px;
-            transition: background-color 0.2s ease;
-        }
-
-        .action-item:hover {
-            background-color: #e2e8f0;
-        }
-
-        .action-item .icon {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .action-item .icon.admin {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .action-item .icon.logout {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-        }
-
-        .action-item .label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .admin-panel-content {
-            text-align: left;
-        }
-
-        .admin-header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .stat-card {
-            background: #f7fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: clamp(1.5rem, 4vw, 2rem);
-            font-weight: bold;
-            color: #2c5282;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
-            color: #718096;
-        }
-
-        .navigation-icons {
-            position: absolute;
-            top: 25px;
-            right: 25px;
-            display: flex;
-            gap: 10px;
-            z-index: 10;
-        }
-
-        .nav-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #4299e1;
-            color: white;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .nav-icon:hover {
-            background: #2c5282;
-            transform: scale(1.1);
-        }
-
-        .nav-icon.logout-icon {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-        }
-
-        .nav-icon.logout-icon:hover {
-            background: linear-gradient(135deg, #fecfef 0%, #ff9a9e 100%);
-        }
-
-        .nav-icon.back-icon {
-            background: #718096;
-        }
-
-        .nav-icon.back-icon:hover {
-            background: #4a5568;
-        }
-
-        .admin-table-wrapper {
-            overflow-x: auto;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        .admin-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-            min-width: 750px;
-        }
-
-        .admin-table th, .admin-table td {
-            border: 1px solid #e2e8f0;
-            padding: 10px 12px;
-            text-align: left;
-            vertical-align: middle;
-        }
-
-        .admin-table th {
-            background-color: #f8f9fa;
-            color: #2c5282;
-            font-weight: 600;
-        }
-
-        .admin-table tr:nth-child(even) {
-            background-color: #fdfdfe;
-        }
-
-        .install-prompt {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #2c5282;
-            color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            display: none;
-            align-items: center;
-            gap: 15px;
-            z-index: 1000;
-            max-width: 90%;
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateX(-50%) translateY(100%); }
-            to { transform: translateX(-50%) translateY(0); }
-        }
-
-        .install-prompt button {
-            background: white;
-            color: #2c5282;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .install-prompt .close-btn {
-            background: transparent;
-            color: white;
-            border: 1px solid white;
-        }
-
-        #toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 25px;
-            border-radius: 10px;
-            color: #fff;
-            z-index: 1500;
-            max-width: 90%;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: none;
-        }
-
-        #toast.error { background: #e53e3e; }
-        #toast.success { background: #38a169; }
-        #toast.warning { background: #dd6b20; }
-        #toast.info { background: #3182ce; }
-
-        #loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(3px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        #loader::after {
-            content: '';
-            border: 5px solid #4299e1;
-            border-top: 5px solid transparent;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .offline-indicator {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: #f56565;
-            color: white;
-            text-align: center;
-            padding: 8px;
-            font-size: 0.9rem;
-            z-index: 3000;
-            display: none;
-        }
-
-        .sync-indicator {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #38a169;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            display: none;
-            z-index: 2500;
-        }
-
-        @media (max-width: 480px) {
-            .container, .container.admin-wider-container {
-                padding: 20px 15px;
-                padding-top: 60px;
-                margin: 10px auto;
-                max-width: calc(100% - 20px);
-            }
-
-            .title {
-                font-size: 1.8rem;
-            }
-
-            .welcome-title {
-                font-size: 1.5rem;
-            }
-
-            .language-toggle {
-                top: 15px;
-                left: 15px;
-            }
-
-            .navigation-icons {
-                top: 15px;
-                right: 15px;
-            }
-
-            .lang-btn {
-                padding: 6px 12px;
-                font-size: 0.8rem;
-            }
-
-            .nav-icon {
-                width: 35px;
-                height: 35px;
-                font-size: 1rem;
-            }
-
-            .btn-primary, .btn-secondary-new {
-                padding: 15px 20px;
-            }
-
-            .page-actions-icons {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 20px;
-            }
-
-            .action-item {
-                flex-basis: 40%;
-            }
-        }
-
-        @media (display-mode: standalone) {
-            body {
-                padding-top: env(safe-area-inset-top);
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attendance System - Sanctuary Keepers</title>
+  
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="https://raw.githubusercontent.com/yourusername/church-assets/main/logo.png" type="image/png" />
+  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/yourusername/church-assets/main/logo.png" />
+  
+  <meta name="theme-color" content="#d32f2f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Attendance System" />
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; color: #333; overflow-x: hidden; }
+    .app-container { min-height: 100vh; display: flex; flex-direction: column; }
+    .header { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); position: sticky; top: 0; z-index: 100; }
+    .logo-container { display: flex; align-items: center; gap: 12px; }
+    .logo { width: 40px; height: 40px; border-radius: 50%; background: #d32f2f; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem; border: 2px solid rgba(255,255,255,0.3); background-image: url('https://raw.githubusercontent.com/yourusername/church-assets/main/logo.png'); background-size: cover; background-position: center; }
+    .app-title { color: white; font-size: 1.2rem; font-weight: 600; }
+    .header-actions { display: flex; align-items: center; gap: 10px; }
+    .language-toggle { display: flex; background: rgba(255,255,255,0.2); border-radius: 20px; overflow: hidden; }
+    .lang-btn { background: transparent; color: white; border: none; padding: 6px 12px; font-size: 0.8rem; cursor: pointer; transition: all 0.3s ease; }
+    .lang-btn.active { background: rgba(255,255,255,0.3); }
+    .install-btn { background: #d32f2f; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; display: none; transition: all 0.3s ease; }
+    .install-btn:hover { background: #b71c1c; transform: translateY(-1px); }
+    .main-content { flex: 1; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 140px); }
+    .page { display: none; width: 100%; max-width: 600px; margin: 0 auto; }
+    .page.active { display: block; animation: fadeIn 0.5s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .welcome-card { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 40px; text-align: center; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 20px 40px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .welcome-logo { width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; background: #d32f2f; color: white; font-size: 2rem; font-weight: bold; border: 3px solid rgba(255,255,255,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.2); background-image: url('https://raw.githubusercontent.com/yourusername/church-assets/main/logo.png'); background-size: cover; background-position: center; }
+    .welcome-title { color: white; font-size: 2rem; font-weight: 700; margin-bottom: 10px; }
+    .welcome-subtitle { color: rgba(255,255,255,0.9); font-size: 1.1rem; margin-bottom: 30px; }
+    .phone-input-container { position: relative; margin-bottom: 20px; }
+    .phone-input { width: 100%; padding: 15px 15px 15px 60px; border: 2px solid rgba(255,255,255,0.3); border-radius: 15px; font-size: 1rem; background: rgba(255,255,255,0.1); color: white; backdrop-filter: blur(10px); transition: all 0.3s ease; }
+    .phone-input::placeholder { color: rgba(255,255,255,0.7); }
+    .phone-input:focus { outline: none; border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.2); }
+    .flag-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-size: 1.5rem; }
+    .form-group { margin-bottom: 20px; text-align: left; }
+    .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: white; font-size: 1rem; }
+    .form-input, .form-select { width: 100%; padding: 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 15px; font-size: 1rem; background: rgba(255,255,255,0.1); color: white; backdrop-filter: blur(10px); transition: all 0.3s ease; }
+    .form-input::placeholder { color: rgba(255,255,255,0.7); }
+    .form-input:focus, .form-select:focus { outline: none; border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.2); }
+    .form-select option { background: #333; color: white; }
+    .birthday-select-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .submit-btn { background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%); color: white; border: none; padding: 15px 30px; border-radius: 15px; font-size: 1rem; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s ease; margin-bottom: 10px; }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(211, 47, 47, 0.3); }
+    .submit-btn:disabled { background: rgba(255,255,255,0.3); cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-secondary { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 12px 24px; border-radius: 15px; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; width: 100%; }
+    .btn-secondary:hover { background: rgba(255,255,255,0.3); }
+    .dashboard-content { display: grid; gap: 20px; }
+    .user-welcome { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 30px; text-align: center; border: 1px solid rgba(255,255,255,0.2); }
+    .user-greeting { color: white; font-size: 1.8rem; font-weight: 600; margin-bottom: 5px; }
+    .user-name { color: rgba(255,255,255,0.9); font-size: 1.3rem; font-style: italic; margin-bottom: 20px; }
+    .attendance-summary { background: rgba(76, 175, 80, 0.2); border: 1px solid rgba(76, 175, 80, 0.3); border-radius: 15px; padding: 20px; margin-bottom: 20px; }
+    .summary-title { color: white; font-size: 1.1rem; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+    .summary-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; }
+    .stat-item { text-align: center; }
+    .stat-number { color: white; font-size: 1.8rem; font-weight: bold; display: block; }
+    .stat-label { color: rgba(255,255,255,0.8); font-size: 0.9rem; }
+    .action-buttons { display: grid; gap: 15px; }
+    .action-btn { background: rgba(255,255,255,0.2); color: white; border: none; padding: 20px; border-radius: 15px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; gap: 12px; text-decoration: none; }
+    .action-btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .action-btn.primary { background: rgba(211, 47, 47, 0.8); border-color: rgba(211, 47, 47, 0.6); }
+    .action-btn.primary:hover { background: rgba(211, 47, 47, 0.9); }
+    .action-btn.admin { background: rgba(156, 39, 176, 0.8); border-color: rgba(156, 39, 176, 0.6); }
+    .action-btn.admin:hover { background: rgba(156, 39, 176, 0.9); }
+    .action-icon { font-size: 1.5rem; }
+    .info-box { border-radius: 15px; padding: 20px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 15px; backdrop-filter: blur(10px); }
+    .info-box.success { background: rgba(76, 175, 80, 0.2); border: 1px solid rgba(76, 175, 80, 0.3); }
+    .info-box.error { background: rgba(244, 67, 54, 0.2); border: 1px solid rgba(244, 67, 54, 0.3); }
+    .info-box.warning { background: rgba(255, 152, 0, 0.2); border: 1px solid rgba(255, 152, 0, 0.3); }
+    .info-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .info-content h3 { color: white; font-size: 1.1rem; margin-bottom: 5px; }
+    .info-content p { color: rgba(255,255,255,0.9); line-height: 1.4; }
+    .bible-verse { background: rgba(255, 193, 7, 0.2); border-left: 4px solid rgba(255, 193, 7, 0.8); border-radius: 0 15px 15px 0; padding: 20px; margin: 20px 0; backdrop-filter: blur(10px); }
+    .verse-text { color: white; font-style: italic; font-size: 1rem; line-height: 1.5; margin-bottom: 10px; }
+    .verse-ref { color: rgba(255,255,255,0.9); font-weight: bold; font-size: 0.9rem; }
+    .admin-content { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 30px; border: 1px solid rgba(255,255,255,0.2); }
+    .admin-header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2); }
+    .admin-title { color: white; font-size: 1.8rem; font-weight: 600; margin-bottom: 5px; }
+    .admin-subtitle { color: rgba(255,255,255,0.8); font-size: 1rem; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 30px; }
+    .stat-card { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 15px; padding: 20px; text-align: center; backdrop-filter: blur(10px); }
+    .stat-card-number { color: white; font-size: 1.8rem; font-weight: bold; margin-bottom: 5px; }
+    .stat-card-label { color: rgba(255,255,255,0.8); font-size: 0.9rem; }
+    .recent-records { margin-bottom: 20px; }
+    .section-title { color: white; font-size: 1.2rem; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+    .records-list { space-y: 10px; }
+    .record-item { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 15px; margin-bottom: 10px; }
+    .record-name { color: white; font-weight: 600; margin-bottom: 5px; }
+    .record-details { color: rgba(255,255,255,0.8); font-size: 0.9rem; }
+    .nav-icons { display: flex; gap: 10px; margin-bottom: 20px; justify-content: flex-end; }
+    .nav-icon { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: all 0.3s ease; }
+    .nav-icon:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
+    .nav-icon.back { background: rgba(96, 125, 139, 0.8); }
+    .nav-icon.logout { background: rgba(244, 67, 54, 0.8); }
+    .status-bar { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 10px 20px; text-align: center; color: white; font-size: 0.9rem; border-top: 1px solid rgba(255,255,255,0.2); }
+    .status-indicator { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
+    .status-online { background: #4caf50; }
+    .status-offline { background: #f44336; }
+    .status-loading { background: #ff9800; animation: pulse 1s infinite; }
+    .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(103, 126, 234, 0.95); backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+    .loading-overlay.show { opacity: 1; visibility: visible; }
+    .loading-spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+    .loading-text { color: white; font-size: 1.1rem; text-align: center; }
+    .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 15px; color: white; font-weight: 500; z-index: 1500; max-width: 90%; text-align: center; backdrop-filter: blur(10px); opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+    .toast.show { opacity: 1; visibility: visible; }
+    .toast.success { background: rgba(76, 175, 80, 0.9); }
+    .toast.error { background: rgba(244, 67, 54, 0.9); }
+    .toast.warning { background: rgba(255, 152, 0, 0.9); }
+    .toast.info { background: rgba(33, 150, 243, 0.9); }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    @media (max-width: 768px) { .header { padding: 12px 15px; } .welcome-card, .admin-content { padding: 25px 20px; margin: 0 10px 20px; } .welcome-title { font-size: 1.8rem; } .stats-grid { grid-template-columns: repeat(2, 1fr); } .birthday-select-group { grid-template-columns: 1fr; } .action-buttons { gap: 12px; } .language-toggle { order: -1; } .header-actions { flex-direction: column; gap: 8px; } }
+    @media (display-mode: standalone) { .install-btn { display: none !important; } .header { padding-top: 20px; } }
+  </style>
 </head>
 <body>
-    <!-- Offline Indicator -->
-    <div class="offline-indicator" id="offlineIndicator">
-        📡 You're offline. Data will sync when connection returns.
-    </div>
+  <div class="app-container">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="logo-container">
+        <div class="logo" id="headerLogo">A</div>
+        <span class="app-title">Attendance System</span>
+      </div>
+      <div class="header-actions">
+        <div class="language-toggle">
+          <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+          <button class="lang-btn" onclick="setLanguage('fr')">FR</button>
+        </div>
+        <button class="install-btn" id="install-btn">📱 Install</button>
+      </div>
+    </header>
 
-    <!-- Sync Indicator -->
-    <div class="sync-indicator" id="syncIndicator">
-        ✅ Data synced
-    </div>
-
-    <!-- Install Prompt -->
-    <div class="install-prompt" id="installPrompt">
-        <span>📱 Install this app for the best experience!</span>
-        <button onclick="installApp()" id="installBtn">Install</button>
-        <button onclick="dismissInstall()" class="close-btn">Dismiss</button>
-    </div>
-
-    <!-- Page 1: Login -->
-    <div class="page active" id="page1">
-        <div class="container">
-            <div class="language-toggle">
-                <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
-                <button class="lang-btn" onclick="setLanguage('fr')">FR</button>
-            </div>
-            <h1 class="title" data-translate="loginTitle">ATTENDANCE SYSTEM</h1>
-            <p class="subtitle" data-translate="loginSubtitle">Enter your phone number to begin:</p>
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      
+      <!-- LOGIN PAGE -->
+      <div class="page active" id="loginPage">
+        <div class="welcome-card">
+          <div class="welcome-logo" id="welcomeLogo">A</div>
+          <h1 class="welcome-title" data-translate="loginTitle">ATTENDANCE SYSTEM</h1>
+          <p class="welcome-subtitle" data-translate="loginSubtitle">Sanctuary Keeper Unit - Winnipeg</p>
+          <form onsubmit="handleLogin(event)">
             <div class="phone-input-container">
-                <div class="flag-icon">🇨🇦</div>
-                <input type="tel" class="phone-input" id="phoneInput" 
-                       placeholder="Enter phone number" maxlength="10">
+              <span class="flag-icon">🇨🇦</span>
+              <input type="tel" class="phone-input" id="phone-input" placeholder="Enter your phone number" maxlength="10" required />
             </div>
-            <button class="btn-primary" onclick="handleLogin()" data-translate="continueBtn">Continue</button>
+            <button type="submit" class="submit-btn" data-translate="continueBtn">Continue</button>
+          </form>
         </div>
-    </div>
+      </div>
 
-    <!-- Page 2: Registration -->
-    <div class="page" id="pageRegister">
-        <div class="container">
-            <div class="language-toggle">
-                <button class="lang-btn" onclick="setLanguage('en')">EN</button>
-                <button class="lang-btn" onclick="setLanguage('fr')">FR</button>
-            </div>
-            
-            <h1 class="welcome-title" data-translate="registerTitle">Create Account</h1>
-            <p class="subtitle" data-translate="registerSubtitle">Please fill in your details to register.</p>
-
+      <!-- REGISTRATION PAGE -->
+      <div class="page" id="registerPage">
+        <div class="welcome-card">
+          <div class="nav-icons">
+            <button class="nav-icon back" onclick="showPage('loginPage')" title="Back">←</button>
+          </div>
+          <h1 class="welcome-title" data-translate="registerTitle">Create Account</h1>
+          <p class="welcome-subtitle" data-translate="registerSubtitle">Please fill in your details to register.</p>
+          <form onsubmit="handleRegister(event)">
             <div class="form-group">
-                <label class="form-label" data-translate="prefixLabel">Prefix</label>
-                <select id="prefixSelect" class="form-select">
-                    <option value="">– Select –</option>
-                    <option value="Mr">Mr</option>
-                    <option value="Mrs">Mrs</option>
-                    <option value="Ms">Ms</option>
-                    <option value="Dr">Dr</option>
-                    <option value="Bro">Bro</option>
-                    <option value="Sis">Sis</option>
-                    <option value="Pastor">Pastor</option>
-                    <option value="Elder">Elder</option>
-                    <option value="Deacon">Deacon</option>
-                    <option value="Deaconess">Deaconess</option>
-                    <option value="Other">Other (Specify)</option>
-                </select>
+              <label class="form-label" data-translate="prefixLabel">Prefix</label>
+              <select id="prefixSelect" class="form-select">
+                <option value="">– Select –</option>
+                <option value="Mr">Mr</option>
+                <option value="Mrs">Mrs</option>
+                <option value="Ms">Ms</option>
+                <option value="Dr">Dr</option>
+                <option value="Bro">Bro</option>
+                <option value="Sis">Sis</option>
+                <option value="Pastor">Pastor</option>
+                <option value="Elder">Elder</option>
+                <option value="Deacon">Deacon</option>
+                <option value="Deaconess">Deaconess</option>
+                <option value="Other">Other (Specify)</option>
+              </select>
             </div>
-
             <div class="form-group" id="otherPrefixGroup" style="display:none;">
-                <label class="form-label" data-translate="otherPrefixLabel">Other Prefix</label>
-                <input type="text" id="otherPrefix" class="generic-input" maxlength="20">
+              <label class="form-label" data-translate="otherPrefixLabel">Other Prefix</label>
+              <input type="text" id="otherPrefix" class="form-input" maxlength="20">
             </div>
-
             <div class="form-group">
-                <label class="form-label" data-translate="firstNameLabel">First Name</label>
-                <input type="text" id="firstName" class="generic-input" maxlength="50" required>
+              <label class="form-label" data-translate="firstNameLabel">First Name</label>
+              <input type="text" id="firstName" class="form-input" maxlength="50" required>
             </div>
-
             <div class="form-group">
-                <label class="form-label" data-translate="lastNameLabel">Last Name</label>
-                <input type="text" id="lastName" class="generic-input" maxlength="50" required>
+              <label class="form-label" data-translate="lastNameLabel">Last Name</label>
+              <input type="text" id="lastName" class="form-input" maxlength="50" required>
             </div>
-
             <div class="form-group">
-                <label class="form-label" data-translate="emailLabel">Email Address</label>
-                <input type="email" id="emailAddress" class="generic-input" maxlength="100" required>
+              <label class="form-label" data-translate="emailLabel">Email Address</label>
+              <input type="email" id="emailAddress" class="form-input" maxlength="100" required>
             </div>
-
             <div class="form-group">
-                <label class="form-label" data-translate="birthdayLabel">Birthday</label>
-                <div class="birthday-select-group">
-                    <select id="birthMonth" class="form-select">
-                        <option value="">Month</option>
-                    </select>
-                    <select id="birthDay" class="form-select">
-                        <option value="">Day</option>
-                    </select>
-                </div>
-            </div>
-
-            <button class="btn-primary" onclick="handleRegister()" data-translate="registerBtn">Register</button>
-            <button class="btn-secondary-new" onclick="showPage('page1')" data-translate="backBtn">Back to Login</button>
-        </div>
-    </div>
-
-    <!-- Page 3: Dashboard -->
-    <div class="page" id="pageDashboard">
-        <div class="container">
-            <div class="language-toggle">
-                <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
-                <button class="lang-btn" onclick="setLanguage('fr')">FR</button>
-            </div>
-            
-            <h1 class="welcome-title" id="welcomeTitle" data-translate="welcomeMsg">Welcome</h1>
-            <p class="welcome-name" id="welcomeName">User</p>
-            
-            <div id="profileInfoBox" class="info-box success">
-                <div class="info-icon">🔔</div>
-                <div class="info-content">
-                    <h3 data-translate="profileComplete">Profile Complete</h3>
-                    <p data-translate="profileCompleteMsg">Your profile information is complete and up-to-date. Thank you!</p>
-                </div>
-            </div>
-
-            <div id="attendanceSummaryBox" class="info-box" style="background: #e6f3ff; border: 2px solid #4299e1;">
-                <div class="info-icon" style="background: #4299e1;">📊</div>
-                <div class="info-content">
-                    <h3 style="color: #2c5282;" data-translate="attendanceSummary">Attendance Summary</h3>
-                    <p><strong data-translate="thisMonth">This Month:</strong> <span id="monthCount">0</span></p>
-                    <p><strong data-translate="thisYear">This Year:</strong> <span id="yearCount">0</span></p>
-                    <p><strong data-translate="status">Status:</strong> <span id="userStatus" style="color: #22543d;">Active</span></p>
-                </div>
-            </div>
-            
-            <div id="attendanceActionSection">
-                <button class="btn-primary" onclick="showAttendancePage()" data-translate="submitAttendanceBtn">Submit Attendance</button>
-            </div>
-            
-            <div class="page-actions-icons">
-                <div class="action-item" id="adminActionItem" style="display:none;" onclick="showAdminPanel()">
-                    <span class="icon admin">⚙️</span>
-                    <span class="label" data-translate="adminPanel">Admin Panel</span>
-                </div>
-                <div class="action-item" onclick="logout()">
-                    <span class="icon logout">🚪</span>
-                    <span class="label" data-translate="logout">Logout</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Page 4: Submit Attendance -->
-    <div class="page" id="pageAttendance">
-        <div class="container">
-            <div class="language-toggle">
-                <button class="lang-btn" onclick="setLanguage('en')">EN</button>
-                <button class="lang-btn" onclick="setLanguage('fr')">FR</button>
-            </div>
-            
-            <h1 class="welcome-title" data-translate="submitAttendanceTitle">Submit Attendance</h1>
-            
-            <div class="form-group">
-                <label class="form-label" data-translate="selectDayLabel">Select Cleaning Day for Attendance</label>
-                <select class="form-select" id="cleaningDaySelect">
-                    <option value="" data-translate="selectDayPlaceholder">– Select Day –</option>
-                    <option value="Monday">Monday</option>
-                    <option value="Tuesday">Tuesday</option>
-                    <option value="Wednesday">Wednesday</option>
-                    <option value="Thursday">Thursday</option>
-                    <option value="Friday">Friday</option>
-                    <option value="Saturday">Saturday</option>
-                    <option value="Sunday">Sunday</option>
+              <label class="form-label" data-translate="birthdayLabel">Birthday</label>
+              <div class="birthday-select-group">
+                <select id="birthMonth" class="form-select">
+                  <option value="">Month</option>
                 </select>
+                <select id="birthDay" class="form-select">
+                  <option value="">Day</option>
+                </select>
+              </div>
             </div>
-            
-            <button class="btn-primary" onclick="submitAttendance()" data-translate="submitBtn">Submit Attendance</button>
-            <button class="btn-secondary-new" onclick="showPage('pageDashboard')" data-translate="backBtn">Back</button>
+            <button type="submit" class="submit-btn" data-translate="registerBtn">Register</button>
+            <button type="button" class="btn-secondary" onclick="showPage('loginPage')" data-translate="backBtn">Back to Login</button>
+          </form>
         </div>
-    </div>
+      </div>
 
-    <!-- Page 5: Success -->
-    <div class="page" id="pageSuccess">
-        <div class="container">
-            <div class="language-toggle">
-                <button class="lang-btn" onclick="setLanguage('en')">EN</button>
-                <button class="lang-btn" onclick="setLanguage('fr')">FR</button>
+      <!-- DASHBOARD PAGE -->
+      <div class="page" id="dashboardPage">
+        <div class="dashboard-content">
+          <div class="user-welcome">
+            <div class="nav-icons">
+              <button class="nav-icon logout" onclick="logout()" title="Logout">🚪</button>
             </div>
-            
-            <div class="success-message-container">
-                <div class="success-icon">✅</div>
-                <h2 id="successTitle" data-translate="attendanceSuccess">Attendance Submitted Successfully!</h2>
-                <p id="successMessage" data-translate="attendanceSuccessMsg">Thank you for your faithful service in the Sanctuary Keepers Unit.</p>
-            </div>
-            
-            <div class="bible-verse">
-                <div class="verse-text" id="verseText">"Whatever you do, work at it with all your heart, as working for the Lord, not for human masters."</div>
-                <div class="verse-ref" id="verseRef">- Colossians 3:23</div>
-            </div>
-            
-            <button class="btn-primary" onclick="showPage('pageDashboard')" data-translate="backToDashboard">Back to Dashboard</button>
-        </div>
-    </div>
-
-    <!-- Page 6: Admin Panel -->
-    <div class="page" id="pageAdmin">
-        <div class="container admin-panel-content admin-wider-container">
-            <div class="language-toggle">
-                <button class="lang-btn" onclick="setLanguage('en')">EN</button>
-                <button class="lang-btn" onclick="setLanguage('fr')">FR</button>
-            </div>
-            
-            <div class="navigation-icons">
-                <button class="nav-icon back-icon" onclick="showPage('pageDashboard')" title="Back to Dashboard">←</button>
-                <button class="nav-icon logout-icon" onclick="logout()" title="Logout">🚪</button>
-            </div>
-            
-            <div class="admin-header">
-                <h1 class="welcome-title" data-translate="adminPanelTitle">Admin Panel</h1>
-                <p data-translate="adminPanelSubtitle">Sanctuary Keepers Unit Management</p>
-            </div>
-            
-            <div class="admin-section">
-                <h3 data-translate="attendanceStats">📊 Attendance Statistics</h3>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number" id="statToday">0</div>
-                        <div class="stat-label" data-translate="today">Today</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="statWeek">0</div>
-                        <div class="stat-label" data-translate="thisWeek">This Week</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="statMonth">0</div>
-                        <div class="stat-label" data-translate="thisMonth">This Month</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="statYear">0</div>
-                        <div class="stat-label" data-translate="thisYear">This Year</div>
-                    </div>
+            <h1 class="user-greeting" id="userGreeting">Welcome</h1>
+            <p class="user-name" id="userName">User</p>
+            <div class="attendance-summary">
+              <div class="summary-title">
+                <span>📊</span>
+                <span data-translate="attendanceSummary">Attendance Summary</span>
+              </div>
+              <div class="summary-stats">
+                <div class="stat-item">
+                  <span class="stat-number" id="monthCount">0</span>
+                  <span class="stat-label" data-translate="thisMonth">This Month</span>
                 </div>
-            </div>
-            
-            <div class="admin-section">
-                <h3 data-translate="recentRecords">📋 Recent Attendance Records</h3>
-                <div id="recentRecordsList">
-                    <p data-translate="loading">Loading records...</p>
+                <div class="stat-item">
+                  <span class="stat-number" id="yearCount">0</span>
+                  <span class="stat-label" data-translate="thisYear">This Year</span>
                 </div>
+              </div>
             </div>
-
-            <button class="btn-primary small-margin" onclick="showMembersPage()" data-translate="manageMembers">Manage Members</button>
-            <button class="btn-primary small-margin" onclick="showAttendanceLog()" data-translate="viewFullLog">View Full Attendance Log</button>
+            <div id="attendanceStatus"></div>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn primary" onclick="showAttendancePage()" id="submitAttendanceBtn">
+              <span class="action-icon">📝</span>
+              <span data-translate="submitAttendanceBtn">Submit Attendance</span>
+            </button>
+            <button class="action-btn admin" onclick="showAdminPanel()" id="adminBtn" style="display:none;">
+              <span class="action-icon">⚙️</span>
+              <span data-translate="adminPanel">Admin Panel</span>
+            </button>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <!-- Page 7: Members Management -->
-    <div class="page" id="pageMembers">
-        <div class="container admin-wider-container admin-panel-content">
-            <div class="language-toggle">
-                <button class="lang-btn" onclick="setLanguage('en')">EN</button>
-                <button class="lang-btn" onclick="setLanguage('fr')">FR</button>
-            </div>
-            
-            <div class="navigation-icons">
-                <button class="nav-icon back-icon" onclick="showPage('pageAdmin')" title="Back to Admin">←</button>
-                <button class="nav-icon logout-icon" onclick="logout()" title="Logout">🚪</button>
-            </div>
-            
-            <div class="admin-header">
-                <h1 class="welcome-title" data-translate="manageMembersTitle">Manage Members</h1>
-            </div>
-            
+      <!-- SUBMIT ATTENDANCE PAGE -->
+      <div class="page" id="attendancePage">
+        <div class="welcome-card">
+          <div class="nav-icons">
+            <button class="nav-icon back" onclick="showPage('dashboardPage')" title="Back">←</button>
+          </div>
+          <h1 class="welcome-title" data-translate="submitAttendanceTitle">Submit Attendance</h1>
+          <form onsubmit="submitAttendance(event)">
             <div class="form-group">
-                <label for="memberSearch" class="form-label" data-translate="searchMembers">Search Members:</label>
-                <input type="text" id="memberSearch" class="generic-input" placeholder="Enter name, phone, or ID..." onkeyup="filterMembers()">
+              <label class="form-label" data-translate="selectDayLabel">Select Cleaning Day for Attendance</label>
+              <select class="form-select" id="cleaningDaySelect" required>
+                <option value="" data-translate="selectDayPlaceholder">– Select Day –</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+                <option value="Sunday">Sunday</option>
+              </select>
             </div>
-            
-            <div class="admin-table-wrapper" id="membersTableContainer">
-                <p data-translate="loading">Loading members...</p>
-            </div>
+            <button type="submit" class="submit-btn" data-translate="submitBtn">Submit Attendance</button>
+            <button type="button" class="btn-secondary" onclick="showPage('dashboardPage')" data-translate="backBtn">Back</button>
+          </form>
         </div>
-    </div>
+      </div>
 
-    <!-- Page 8: Attendance Log -->
-    <div class="page" id="pageAttendanceLog">
-        <div class="container admin-wider-container admin-panel-content">
-            <div class="language-toggle">
-                <button class="lang-btn" onclick="setLanguage('en')">EN</button>
-                <button class="lang-btn" onclick="setLanguage('fr')">FR</button>
+      <!-- SUCCESS PAGE -->
+      <div class="page" id="successPage">
+        <div class="welcome-card">
+          <div class="nav-icons">
+            <button class="nav-icon back" onclick="showPage('dashboardPage')" title="Back to Dashboard">←</button>
+          </div>
+          <div class="info-box success">
+            <div class="info-icon">✅</div>
+            <div class="info-content">
+              <h3 data-translate="attendanceSuccess">Attendance Submitted Successfully!</h3>
+              <p data-translate="attendanceSuccessMsg">Thank you for your faithful service in the Sanctuary Keepers Unit.</p>
             </div>
-            
-            <div class="navigation-icons">
-                <button class="nav-icon back-icon" onclick="showPage('pageAdmin')" title="Back to Admin">←</button>
-                <button class="nav-icon logout-icon" onclick="logout()" title="Logout">🚪</button>
-            </div>
-            
-            <div class="admin-header">
-                <h1 class="welcome-title" data-translate="attendanceLogTitle">Full Attendance Log</h1>
-            </div>
-            
-            <div class="admin-table-wrapper" id="attendanceLogContainer">
-                <p data-translate="loading">Loading attendance log...</p>
-            </div>
+          </div>
+          <div class="bible-verse">
+            <div class="verse-text" id="verseText">"Whatever you do, work at it with all your heart, as working for the Lord, not for human masters."</div>
+            <div class="verse-ref" id="verseRef">- Colossians 3:23</div>
+          </div>
+          <button class="submit-btn" onclick="showPage('dashboardPage')" data-translate="backToDashboard">Back to Dashboard</button>
         </div>
+      </div>
+
+      <!-- ADMIN PANEL PAGE -->
+      <div class="page" id="adminPage">
+        <div class="admin-content">
+          <div class="nav-icons">
+            <button class="nav-icon back" onclick="showPage('dashboardPage')" title="Back to Dashboard">←</button>
+            <button class="nav-icon logout" onclick="logout()" title="Logout">🚪</button>
+          </div>
+          <div class="admin-header">
+            <h1 class="admin-title" data-translate="adminPanelTitle">Admin Panel</h1>
+            <p class="admin-subtitle" data-translate="adminPanelSubtitle">Sanctuary Keepers Unit Management</p>
+          </div>
+          <div class="section-title">
+            <span>📊</span>
+            <span data-translate="attendanceStats">Attendance Statistics</span>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-card-number" id="statToday">0</div>
+              <div class="stat-card-label" data-translate="today">Today</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-number" id="statWeek">0</div>
+              <div class="stat-card-label" data-translate="thisWeek">This Week</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-number" id="statMonth">0</div>
+              <div class="stat-card-label" data-translate="thisMonth">This Month</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-number" id="statYear">0</div>
+              <div class="stat-card-label" data-translate="thisYear">This Year</div>
+            </div>
+          </div>
+          <div class="recent-records">
+            <div class="section-title">
+              <span>📋</span>
+              <span data-translate="recentRecords">Recent Attendance Records</span>
+            </div>
+            <div class="records-list" id="recentRecordsList">
+              <p data-translate="loading">Loading records...</p>
+            </div>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn" onclick="showMembersPage()">
+              <span class="action-icon">👥</span>
+              <span data-translate="manageMembers">Manage Members</span>
+            </button>
+            <button class="action-btn" onclick="showAttendanceLog()">
+              <span class="action-icon">📊</span>
+              <span data-translate="viewFullLog">View Full Attendance Log</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- STATUS BAR -->
+    <div class="status-bar">
+      <span class="status-indicator status-online" id="status-indicator"></span>
+      <span id="status-text">Ready</span>
     </div>
-
-    <!-- Toast Notification -->
-    <div id="toast"></div>
-
-    <!-- Loader -->
-    <div id="loader"></div>
-
-    <footer style="background: #f1f5f9; padding: 10px 0; text-align: center; color: #64748b; font-size: 0.8rem; border-top: 1px solid #e2e8f0; width:100%; position:relative; margin-top:auto;">
-        Winners Chapel Int'l • Sanctuary Keeper Unit • Winnipeg, Canada
-    </footer>
-
-    <script>
-        console.log('🚀 Standalone PWA App Starting...');
-
-        // ===== GLOBAL VARIABLES =====
-        let currentUser = null;
-        let currentLanguage = 'en';
-        let deferredPrompt = null;
-        let isOnline = navigator.onLine;
-
-        // ===== TRANSLATIONS =====
-        const translations = {
-            en: {
-                loginTitle: "ATTENDANCE SYSTEM",
-                loginSubtitle: "Enter your phone number to begin:",
-                continueBtn: "Continue",
-                registerTitle: "Create Account",
-                registerSubtitle: "Please fill in your details to register.",
-                registerBtn: "Register",
-                backBtn: "Back",
-                prefixLabel: "Prefix",
-                otherPrefixLabel: "Other Prefix",
-                firstNameLabel: "First Name",
-                lastNameLabel: "Last Name", 
-                emailLabel: "Email Address",
-                birthdayLabel: "Birthday",
-                welcomeMsg: "Welcome",
-                profileComplete: "Profile Complete",
-                profileCompleteMsg: "Your profile information is complete and up-to-date. Thank you!",
-                attendanceSummary: "Attendance Summary",
-                thisMonth: "This Month",
-                thisYear: "This Year",
-                status: "Status",
-                submitAttendanceBtn: "Submit Attendance",
-                adminPanel: "Admin Panel",
-                logout: "Logout",
-                submitAttendanceTitle: "Submit Attendance",
-                selectDayLabel: "Select Cleaning Day for Attendance",
-                selectDayPlaceholder: "– Select Day –",
-                submitBtn: "Submit Attendance",
-                attendanceSuccess: "Attendance Submitted Successfully!",
-                attendanceSuccessMsg: "Thank you for your faithful service in the Sanctuary Keepers Unit.",
-                backToDashboard: "Back to Dashboard",
-                adminPanelTitle: "Admin Panel",
-                adminPanelSubtitle: "Sanctuary Keepers Unit Management",
-                attendanceStats: "📊 Attendance Statistics",
-                today: "Today",
-                thisWeek: "This Week",
-                recentRecords: "📋 Recent Attendance Records",
-                loading: "Loading...",
-                manageMembers: "Manage Members",
-                viewFullLog: "View Full Attendance Log",
-                manageMembersTitle: "Manage Members",
-                searchMembers: "Search Members:",
-                attendanceLogTitle: "Full Attendance Log",
-                phoneRequired: "Please enter a valid 10-digit phone number",
-                fieldsRequired: "Please fill in all required fields",
-                emailInvalid: "Please enter a valid email address",
-                registrationSuccess: "Registration successful! You are now logged in.",
-                loginSuccess: "Login successful!",
-                attendanceSubmitted: "Attendance submitted successfully!",
-                selectDay: "Please select a cleaning day",
-                alreadySubmitted: "You have already submitted attendance this week",
-                userNotFound: "Phone number not found. Please register.",
-                goodMorning: "Good morning",
-                goodAfternoon: "Good afternoon", 
-                goodEvening: "Good evening",
-                noData: "No data available",
-                syncSuccess: "Data synchronized successfully",
-                offlineMode: "Working in offline mode",
-                dayMonday: "Monday",
-                dayTuesday: "Tuesday",
-                dayWednesday: "Wednesday", 
-                dayThursday: "Thursday",
-                dayFriday: "Friday",
-                daySaturday: "Saturday",
-                daySunday: "Sunday"
-            },
-            fr: {
-                loginTitle: "SYSTÈME DE PRÉSENCE",
-                loginSubtitle: "Entrez votre numéro de téléphone pour commencer:",
-                continueBtn: "Continuer",
-                registerTitle: "Créer un Compte",
-                registerSubtitle: "Veuillez remplir vos informations pour vous inscrire.",
-                registerBtn: "S'inscrire",
-                backBtn: "Retour",
-                prefixLabel: "Préfixe",
-                otherPrefixLabel: "Autre Préfixe",
-                firstNameLabel: "Prénom",
-                lastNameLabel: "Nom de famille",
-                emailLabel: "Adresse e-mail",
-                birthdayLabel: "Anniversaire",
-                welcomeMsg: "Bienvenue",
-                profileComplete: "Profil Complet",
-                profileCompleteMsg: "Vos informations de profil sont complètes et à jour. Merci!",
-                attendanceSummary: "Résumé de Présence",
-                thisMonth: "Ce Mois",
-                thisYear: "Cette Année",
-                status: "Statut",
-                submitAttendanceBtn: "Soumettre la Présence",
-                adminPanel: "Panneau d'Administration",
-                logout: "Déconnexion",
-                submitAttendanceTitle: "Soumettre la Présence",
-                selectDayLabel: "Sélectionnez le jour de nettoyage pour la présence",
-                selectDayPlaceholder: "– Sélectionner le jour –",
-                submitBtn: "Soumettre la Présence",
-                attendanceSuccess: "Présence soumise avec succès!",
-                attendanceSuccessMsg: "Merci pour votre service fidèle dans l'Unité des Gardiens du Sanctuaire.",
-                backToDashboard: "Retour au tableau de bord",
-                adminPanelTitle: "Panneau d'Administration",
-                adminPanelSubtitle: "Gestion de l'Unité des Gardiens du Sanctuaire",
-                attendanceStats: "📊 Statistiques de Présence",
-                today: "Aujourd'hui",
-                thisWeek: "Cette Semaine",
-                recentRecords: "📋 Registres de Présence Récents",
-                loading: "Chargement...",
-                manageMembers: "Gérer les Membres",
-                viewFullLog: "Voir le Journal Complet",
-                manageMembersTitle: "Gérer les Membres",
-                searchMembers: "Rechercher des Membres:",
-                attendanceLogTitle: "Journal Complet de Présence",
-                phoneRequired: "Veuillez entrer un numéro de téléphone valide à 10 chiffres",
-                fieldsRequired: "Veuillez remplir tous les champs requis",
-                emailInvalid: "Veuillez entrer une adresse e-mail valide",
-                registrationSuccess: "Inscription réussie! Vous êtes maintenant connecté.",
-                loginSuccess: "Connexion réussie!",
-                attendanceSubmitted: "Présence soumise avec succès!",
-                selectDay: "Veuillez sélectionner un jour de nettoyage",
-                alreadySubmitted: "Vous avez déjà soumis la présence cette semaine",
-                userNotFound: "Numéro de téléphone non trouvé. Veuillez vous inscrire.",
-                goodMorning: "Bonjour",
-                goodAfternoon: "Bon après-midi",
-                goodEvening: "Bonsoir",
-                noData: "Aucune donnée disponible",
-                syncSuccess: "Données synchronisées avec succès",
-                offlineMode: "Fonctionnement en mode hors ligne",
-                dayMonday: "Lundi",
-                dayTuesday: "Mardi", 
-                dayWednesday: "Mercredi",
-                dayThursday: "Jeudi",
-                dayFriday: "Vendredi",
-                daySaturday: "Samedi",
-                daySunday: "Dimanche"
-            }
-        };
-
-        // ===== BIBLE VERSES =====
-        const bibleVerses = [
-            {
-                text_en: "Whatever you do, work at it with all your heart, as working for the Lord, not for human masters.",
-                ref_en: "Colossians 3:23",
-                text_fr: "Tout ce que vous faites, faites-le de bon coeur, comme pour le Seigneur et non pour des hommes.",
-                ref_fr: "Colossiens 3:23"
-            },
-            {
-                text_en: "Serve wholeheartedly, as if you were serving the Lord, not people.",
-                ref_en: "Ephesians 6:7",
-                text_fr: "Servez de bon coeur, comme si vous serviez le Seigneur et non des hommes.",
-                ref_fr: "Éphésiens 6:7"
-            },
-            {
-                text_en: "Let us not become weary in doing good, for at the proper time we will reap a harvest if we do not give up.",
-                ref_en: "Galatians 6:9",
-                text_fr: "Ne nous lassons pas de faire le bien; car nous moissonnerons au temps convenable, si nous ne nous relâchons pas.",
-                ref_fr: "Galates 6:9"
-            }
-        ];
-
-        // ===== UTILITY FUNCTIONS =====
-        function showToast(message, type = 'info', duration = 3000) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = type;
-            toast.style.display = 'block';
-            
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, duration);
-        }
-
-        function showLoader() {
-            document.getElementById('loader').style.display = 'flex';
-        }
-
-        function hideLoader() {
-            document.getElementById('loader').style.display = 'none';
-        }
-
-        function translate(key) {
-            return translations[currentLanguage][key] || translations.en[key] || key;
-        }
-
-        function updateTranslations() {
-            document.querySelectorAll('[data-translate]').forEach(element => {
-                const key = element.getAttribute('data-translate');
-                element.textContent = translate(key);
-            });
-            
-            // Update day options in cleaning day select
-            const cleaningDaySelect = document.getElementById('cleaningDaySelect');
-            if (cleaningDaySelect) {
-                const options = cleaningDaySelect.querySelectorAll('option[value]');
-                options.forEach(option => {
-                    if (option.value) {
-                        const dayKey = 'day' + option.value;
-                        option.textContent = translate(dayKey);
-                    }
-                });
-            }
-        }
-
-        function setLanguage(lang) {
-            currentLanguage = lang;
-            localStorage.setItem('attendanceApp_language', lang);
-            
-            // Update language toggle buttons
-            document.querySelectorAll('.language-toggle').forEach(toggle => {
-                toggle.querySelectorAll('.lang-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                    if (btn.textContent.toLowerCase() === lang.toLowerCase()) {
-                        btn.classList.add('active');
-                    }
-                });
-            });
-            
-            updateTranslations();
-        }
-
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-            document.getElementById(pageId).classList.add('active');
-            window.scrollTo(0, 0);
-        }
-
-        function generateId() {
-            return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        }
-
-        function getGreeting() {
-            const hour = new Date().getHours();
-            if (hour < 12) return translate('goodMorning');
-            if (hour < 18) return translate('goodAfternoon');
-            return translate('goodEvening');
-        }
-
-        function getWeekId(date = new Date()) {
-            const year = date.getFullYear();
-            const firstDay = new Date(year, 0, 1);
-            const days = Math.floor((date - firstDay) / (24 * 60 * 60 * 1000));
-            const week = Math.ceil((days + firstDay.getDay() + 1) / 7);
-            return `${year}-W${week.toString().padStart(2, '0')}`;
-        }
-
-        // ===== LOCAL STORAGE FUNCTIONS =====
-        function saveUser(user) {
-            currentUser = user;
-            localStorage.setItem('attendanceApp_currentUser', JSON.stringify(user));
-        }
-
-        function loadUser() {
-            const userData = localStorage.getItem('attendanceApp_currentUser');
-            if (userData) {
-                currentUser = JSON.parse(userData);
-                return currentUser;
-            }
-            return null;
-        }
-
-        function saveUsers(users) {
-            localStorage.setItem('attendanceApp_users', JSON.stringify(users));
-        }
-
-        function loadUsers() {
-            const usersData = localStorage.getItem('attendanceApp_users');
-            return usersData ? JSON.parse(usersData) : [];
-        }
-
-        function saveAttendanceRecord(record) {
-            const records = loadAttendanceRecords();
-            records.push(record);
-            localStorage.setItem('attendanceApp_attendance', JSON.stringify(records));
-        }
-
-        function loadAttendanceRecords() {
-            const recordsData = localStorage.getItem('attendanceApp_attendance');
-            return recordsData ? JSON.parse(recordsData) : [];
-        }
-
-        // ===== PWA FUNCTIONS =====
-        function initializePWA() {
-            // Service Worker registration
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register(createServiceWorkerBlob())
-                    .then(registration => {
-                        console.log('✅ Service Worker registered:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.error('❌ Service Worker registration failed:', error);
-                    });
-            }
-
-            // Install prompt
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                document.getElementById('installPrompt').style.display = 'flex';
-            });
-
-            // Online/offline detection
-            window.addEventListener('online', () => {
-                isOnline = true;
-                document.getElementById('offlineIndicator').style.display = 'none';
-                showToast(translate('syncSuccess'), 'success');
-            });
-
-            window.addEventListener('offline', () => {
-                isOnline = false;
-                document.getElementById('offlineIndicator').style.display = 'block';
-                showToast(translate('offlineMode'), 'warning');
-            });
-        }
-
-        function createServiceWorkerBlob() {
-            const swCode = `
-                const CACHE_NAME = 'attendance-app-v1';
-                const urlsToCache = [
-                    '/',
-                    '/manifest.json'
-                ];
-
-                self.addEventListener('install', event => {
-                    event.waitUntil(
-                        caches.open(CACHE_NAME)
-                            .then(cache => cache.addAll(urlsToCache))
-                    );
-                });
-
-                self.addEventListener('fetch', event => {
-                    event.respondWith(
-                        caches.match(event.request)
-                            .then(response => {
-                                if (response) {
-                                    return response;
-                                }
-                                return fetch(event.request);
-                            })
-                    );
-                });
-            `;
-            
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            return URL.createObjectURL(blob);
-        }
-
-        function installApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((result) => {
-                    if (result.outcome === 'accepted') {
-                        console.log('✅ App installed');
-                        showToast('App installed successfully!', 'success');
-                    }
-                    deferredPrompt = null;
-                    document.getElementById('installPrompt').style.display = 'none';
-                });
-            }
-        }
-
-        function dismissInstall() {
-            document.getElementById('installPrompt').style.display = 'none';
-            deferredPrompt = null;
-        }
-
-        // ===== AUTHENTICATION FUNCTIONS =====
-        function handleLogin() {
-            const phoneInput = document.getElementById('phoneInput');
-            const phone = phoneInput.value.trim().replace(/\D/g, '');
-            
-            if (!phone || phone.length !== 10) {
-                showToast(translate('phoneRequired'), 'error');
-                return;
-            }
-
-            showLoader();
-            
-            // Simulate API delay
-            setTimeout(() => {
-                const users = loadUsers();
-                const user = users.find(u => u.phoneNumber === phone);
-                
-                if (user) {
-                    saveUser(user);
-                    updateDashboard();
-                    showPage('pageDashboard');
-                    showToast(translate('loginSuccess'), 'success');
-                } else {
-                    // Show registration form
-                    document.getElementById('phoneInput').value = phone;
-                    showPage('pageRegister');
-                    showToast(translate('userNotFound'), 'warning');
-                }
-                
-                hideLoader();
-            }, 1000);
-        }
-
-        function handleRegister() {
-            const phone = document.getElementById('phoneInput').value.trim().replace(/\D/g, '');
-            const prefix = document.getElementById('prefixSelect').value === 'Other' 
-                ? document.getElementById('otherPrefix').value.trim()
-                : document.getElementById('prefixSelect').value;
-            const firstName = document.getElementById('firstName').value.trim();
-            const lastName = document.getElementById('lastName').value.trim();
-            const email = document.getElementById('emailAddress').value.trim();
-            const birthMonth = document.getElementById('birthMonth').value;
-            const birthDay = document.getElementById('birthDay').value;
-
-            // Validation
-            if (!phone || phone.length !== 10) {
-                showToast(translate('phoneRequired'), 'error');
-                return;
-            }
-
-            if (!firstName || !lastName || !email) {
-                showToast(translate('fieldsRequired'), 'error');
-                return;
-            }
-
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                showToast(translate('emailInvalid'), 'error');
-                return;
-            }
-
-            showLoader();
-
-            // Create new user
-            const newUser = {
-                id: generateId(),
-                phoneNumber: phone,
-                prefix: prefix || '',
-                firstName: firstName,
-                lastName: lastName,
-                emailAddress: email,
-                birthday: birthMonth && birthDay ? `${birthMonth}-${birthDay}` : '',
-                role: 'User',
-                registrationDate: new Date().toISOString(),
-                attendanceThisMonth: 0,
-                attendanceThisYear: 0,
-                lastAttendanceDate: null,
-                weeklyAttendanceSubmitted: false
-            };
-
-            // Save user
-            const users = loadUsers();
-            users.push(newUser);
-            saveUsers(users);
-            saveUser(newUser);
-
-            setTimeout(() => {
-                updateDashboard();
-                showPage('pageDashboard');
-                showToast(translate('registrationSuccess'), 'success');
-                hideLoader();
-            }, 1000);
-        }
-
-        function logout() {
-            currentUser = null;
-            localStorage.removeItem('attendanceApp_currentUser');
-            
-            // Reset forms
-            document.getElementById('phoneInput').value = '';
-            document.getElementById('cleaningDaySelect').value = '';
-            
-            showPage('page1');
-            showToast(translate('logout'), 'info');
-        }
-
-        // ===== DASHBOARD FUNCTIONS =====
-        function updateDashboard() {
-            if (!currentUser) return;
-
-            const greeting = getGreeting();
-            const displayName = `${currentUser.prefix} ${currentUser.firstName}`.trim();
-            
-            document.getElementById('welcomeTitle').textContent = `${greeting},`;
-            document.getElementById('welcomeName').textContent = displayName;
-            
-            // Update attendance summary
-            document.getElementById('monthCount').textContent = currentUser.attendanceThisMonth || 0;
-            document.getElementById('yearCount').textContent = currentUser.attendanceThisYear || 0;
-            
-            // Check if already submitted this week
-            const currentWeek = getWeekId();
-            const lastSubmissionWeek = currentUser.lastAttendanceWeek;
-            const hasSubmittedThisWeek = lastSubmissionWeek === currentWeek;
-            
-            const attendanceSection = document.getElementById('attendanceActionSection');
-            if (hasSubmittedThisWeek) {
-                attendanceSection.innerHTML = `
-                    <div class="info-box success" style="margin:0; text-align:center; padding: 15px;">
-                        <p>${translate('alreadySubmitted')}</p>
-                    </div>
-                `;
-            } else {
-                attendanceSection.innerHTML = `
-                    <button class="btn-primary" onclick="showAttendancePage()" data-translate="submitAttendanceBtn">${translate('submitAttendanceBtn')}</button>
-                `;
-            }
-            
-            // Show admin panel if user has admin role
-            const adminActionItem = document.getElementById('adminActionItem');
-            if (currentUser.role === 'Admin' || currentUser.role === 'SuperAdmin') {
-                adminActionItem.style.display = 'flex';
-            } else {
-                adminActionItem.style.display = 'none';
-            }
-        }
-
-        function showAttendancePage() {
-            const currentWeek = getWeekId();
-            if (currentUser.lastAttendanceWeek === currentWeek) {
-                showToast(translate('alreadySubmitted'), 'warning');
-                return;
-            }
-            showPage('pageAttendance');
-        }
-
-        function submitAttendance() {
-            const cleaningDay = document.getElementById('cleaningDaySelect').value;
-            
-            if (!cleaningDay) {
-                showToast(translate('selectDay'), 'error');
-                return;
-            }
-
-            showLoader();
-            
-            // Create attendance record
-            const attendanceRecord = {
-                id: generateId(),
-                userId: currentUser.id,
-                memberName: `${currentUser.prefix} ${currentUser.firstName} ${currentUser.lastName}`.trim(),
-                phoneNumber: currentUser.phoneNumber,
-                cleaningDay: cleaningDay,
-                attendanceDate: new Date().toISOString().split('T')[0],
-                dayOfWeek: new Date().toLocaleDateString('en-US', { weekday: 'long' }),
-                weekId: getWeekId(),
-                timestamp: new Date().toISOString()
-            };
-
-            // Save attendance record
-            saveAttendanceRecord(attendanceRecord);
-            
-            // Update user data
-            currentUser.attendanceThisMonth = (currentUser.attendanceThisMonth || 0) + 1;
-            currentUser.attendanceThisYear = (currentUser.attendanceThisYear || 0) + 1;
-            currentUser.lastAttendanceDate = attendanceRecord.attendanceDate;
-            currentUser.lastAttendanceWeek = attendanceRecord.weekId;
-            
-            // Save updated user
-            saveUser(currentUser);
-            const users = loadUsers();
-            const userIndex = users.findIndex(u => u.id === currentUser.id);
-            if (userIndex !== -1) {
-                users[userIndex] = currentUser;
-                saveUsers(users);
-            }
-
-            setTimeout(() => {
-                // Show random Bible verse
-                const randomVerse = bibleVerses[Math.floor(Math.random() * bibleVerses.length)];
-                document.getElementById('verseText').textContent = `"${randomVerse[`text_${currentLanguage}`]}"`;
-                document.getElementById('verseRef').textContent = `- ${randomVerse[`ref_${currentLanguage}`]}`;
-                
-                showPage('pageSuccess');
-                showToast(translate('attendanceSubmitted'), 'success');
-                hideLoader();
-            }, 1500);
-        }
-
-        // ===== ADMIN FUNCTIONS =====
-        function showAdminPanel() {
-            if (!currentUser || (currentUser.role !== 'Admin' && currentUser.role !== 'SuperAdmin')) {
-                showToast('Access denied', 'error');
-                return;
-            }
-            
-            loadAdminStats();
-            showPage('pageAdmin');
-        }
-
-        function loadAdminStats() {
-            const records = loadAttendanceRecords();
-            const today = new Date().toISOString().split('T')[0];
-            const currentWeek = getWeekId();
-            const currentMonth = new Date().getMonth();
-            const currentYear = new Date().getFullYear();
-            
-            // Calculate stats
-            const todayCount = records.filter(r => r.attendanceDate === today).length;
-            const weekCount = records.filter(r => r.weekId === currentWeek).length;
-            const monthCount = records.filter(r => {
-                const recordDate = new Date(r.attendanceDate);
-                return recordDate.getMonth() === currentMonth && recordDate.getFullYear() === currentYear;
-            }).length;
-            const yearCount = records.filter(r => {
-                const recordDate = new Date(r.attendanceDate);
-                return recordDate.getFullYear() === currentYear;
-            }).length;
-            
-            // Update stats display
-            document.getElementById('statToday').textContent = todayCount;
-            document.getElementById('statWeek').textContent = weekCount;
-            document.getElementById('statMonth').textContent = monthCount;
-            document.getElementById('statYear').textContent = yearCount;
-            
-            // Load recent records
-            const recentRecords = records
-                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-                .slice(0, 5);
-            
-            const recentRecordsList = document.getElementById('recentRecordsList');
-            if (recentRecords.length > 0) {
-                recentRecordsList.innerHTML = recentRecords.map(record => `
-                    <div style="background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 10px;">
-                        <div style="font-weight: 600; color: #2d3748;">${record.memberName}</div>
-                        <div style="font-size: 0.9rem; color: #718096; margin-top: 5px;">
-                            ${record.dayOfWeek}, ${record.attendanceDate} - ${record.cleaningDay}
-                        </div>
-                    </div>
-                `).join('');
-            } else {
-                recentRecordsList.innerHTML = `<p style="color: #718096;">${translate('noData')}</p>`;
-            }
-        }
-
-        function showMembersPage() {
-            const users = loadUsers();
-            const container = document.getElementById('membersTableContainer');
-            
-            if (users.length > 0) {
-                container.innerHTML = `
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Phone</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Registration Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${users.map(user => `
-                                <tr class="member-row" data-search="${user.firstName} ${user.lastName} ${user.phoneNumber} ${user.emailAddress}">
-                                    <td>${user.id.split('_')[1]}</td>
-                                    <td>${user.prefix} ${user.firstName} ${user.lastName}</td>
-                                    <td>${user.phoneNumber}</td>
-                                    <td>${user.emailAddress}</td>
-                                    <td>${user.role}</td>
-                                    <td>${new Date(user.registrationDate).toLocaleDateString()}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-            } else {
-                container.innerHTML = `<p style="color: #718096;">${translate('noData')}</p>`;
-            }
-            
-            showPage('pageMembers');
-        }
-
-        function filterMembers() {
-            const searchTerm = document.getElementById('memberSearch').value.toLowerCase();
-            const rows = document.querySelectorAll('.member-row');
-            
-            rows.forEach(row => {
-                const searchData = row.getAttribute('data-search').toLowerCase();
-                if (searchData.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        }
-
-        function showAttendanceLog() {
-            const records = loadAttendanceRecords();
-            const container = document.getElementById('attendanceLogContainer');
-            
-            if (records.length > 0) {
-                const sortedRecords = records.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                
-                container.innerHTML = `
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Timestamp</th>
-                                <th>Member Name</th>
-                                <th>Phone</th>
-                                <th>Cleaning Day</th>
-                                <th>Day of Week</th>
-                                <th>Week ID</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${sortedRecords.map(record => `
-                                <tr>
-                                    <td>${new Date(record.timestamp).toLocaleString()}</td>
-                                    <td>${record.memberName}</td>
-                                    <td>${record.phoneNumber}</td>
-                                    <td>${translate('day' + record.cleaningDay)}</td>
-                                    <td>${record.dayOfWeek}</td>
-                                    <td>${record.weekId}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-            } else {
-                container.innerHTML = `<p style="color: #718096;">${translate('noData')}</p>`;
-            }
-            
-            showPage('pageAttendanceLog');
-        }
-
-        // ===== FORM INITIALIZATION =====
-        function initializeForms() {
-            // Initialize month dropdown
-            const months = [
-                'January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December'
-            ];
-            
-            const monthSelect = document.getElementById('birthMonth');
-            months.forEach((month, index) => {
-                const option = document.createElement('option');
-                option.value = month.substring(0, 3);
-                option.textContent = month;
-                monthSelect.appendChild(option);
-            });
-            
-            // Initialize day dropdown
-            const daySelect = document.getElementById('birthDay');
-            for (let i = 1; i <= 31; i++) {
-                const option = document.createElement('option');
-                option.value = i.toString().padStart(2, '0');
-                option.textContent = i;
-                daySelect.appendChild(option);
-            }
-            
-            // Handle prefix select change
-            document.getElementById('prefixSelect').addEventListener('change', function() {
-                const otherGroup = document.getElementById('otherPrefixGroup');
-                if (this.value === 'Other') {
-                    otherGroup.style.display = 'block';
-                    document.getElementById('otherPrefix').focus();
-                } else {
-                    otherGroup.style.display = 'none';
-                }
-            });
-        }
-
-        // ===== SYNC FUNCTIONS (for future backend integration) =====
-        function syncWithBackend() {
-            if (!isOnline) {
-                console.log('⚠️ Offline - sync skipped');
-                return;
-            }
-            
-            console.log('🔄 Syncing with backend...');
-            
-            // This is where you would integrate with your Google Apps Script
-            // For now, we'll just show a sync indicator
-            const syncIndicator = document.getElementById('syncIndicator');
-            syncIndicator.style.display = 'block';
-            
-            setTimeout(() => {
-                syncIndicator.style.display = 'none';
-            }, 2000);
-        }
-
-        // ===== DEMO DATA SETUP =====
-        function setupDemoData() {
-            const users = loadUsers();
-            
-            // Add demo admin user if no users exist
-            if (users.length === 0) {
-                const demoAdmin = {
-                    id: 'admin_demo_001',
-                    phoneNumber: '4311234567',
-                    prefix: 'Pastor',
-                    firstName: 'John',
-                    lastName: 'Administrator',
-                    emailAddress: 'admin@sanctuary.ca',
-                    birthday: 'Jan-15',
-                    role: 'SuperAdmin',
-                    registrationDate: new Date().toISOString(),
-                    attendanceThisMonth: 4,
-                    attendanceThisYear: 15,
-                    lastAttendanceDate: null,
-                    weeklyAttendanceSubmitted: false
-                };
-                
-                const demoUser = {
-                    id: 'user_demo_001',
-                    phoneNumber: '4317654321',
-                    prefix: 'Bro',
-                    firstName: 'David',
-                    lastName: 'Member',
-                    emailAddress: 'member@sanctuary.ca',
-                    birthday: 'Mar-22',
-                    role: 'User',
-                    registrationDate: new Date().toISOString(),
-                    attendanceThisMonth: 2,
-                    attendanceThisYear: 8,
-                    lastAttendanceDate: null,
-                    weeklyAttendanceSubmitted: false
-                };
-                
-                users.push(demoAdmin, demoUser);
-                saveUsers(users);
-                
-                // Add some demo attendance records
-                const demoRecords = [
-                    {
-                        id: 'record_001',
-                        userId: demoAdmin.id,
-                        memberName: 'Pastor John Administrator',
-                        phoneNumber: demoAdmin.phoneNumber,
-                        cleaningDay: 'Saturday',
-                        attendanceDate: new Date(Date.now() - 86400000).toISOString().split('T')[0], // Yesterday
-                        dayOfWeek: 'Saturday',
-                        weekId: getWeekId(new Date(Date.now() - 86400000)),
-                        timestamp: new Date(Date.now() - 86400000).toISOString()
-                    },
-                    {
-                        id: 'record_002',
-                        userId: demoUser.id,
-                        memberName: 'Bro David Member',
-                        phoneNumber: demoUser.phoneNumber,
-                        cleaningDay: 'Sunday',
-                        attendanceDate: new Date().toISOString().split('T')[0], // Today
-                        dayOfWeek: new Date().toLocaleDateString('en-US', { weekday: 'long' }),
-                        weekId: getWeekId(),
-                        timestamp: new Date().toISOString()
-                    }
-                ];
-                
-                demoRecords.forEach(record => saveAttendanceRecord(record));
-                
-                console.log('✅ Demo data initialized');
-            }
-        }
-
-        // ===== APP INITIALIZATION =====
-        function initializeApp() {
-            console.log('🚀 Initializing PWA Attendance System...');
-            
-            // Load saved language
-            const savedLanguage = localStorage.getItem('attendanceApp_language') || 'en';
-            setLanguage(savedLanguage);
-            
-            // Initialize PWA features
-            initializePWA();
-            
-            // Initialize forms
-            initializeForms();
-            
-            // Setup demo data
-            setupDemoData();
-            
-            // Check for existing user session
-            const savedUser = loadUser();
-            if (savedUser) {
-                updateDashboard();
-                showPage('pageDashboard');
-                console.log('✅ User session restored');
-            } else {
-                showPage('page1');
-                console.log('ℹ️ No existing session - showing login');
-            }
-            
-            // Auto-sync every 5 minutes when online
-            setInterval(() => {
-                if (isOnline) {
-                    syncWithBackend();
-                }
-            }, 5 * 60 * 1000);
-            
-            console.log('✅ PWA Attendance System initialized');
-        }
-
-        // ===== KEYBOARD SHORTCUTS =====
-        document.addEventListener('keydown', function(e) {
-            // ESC to go back
-            if (e.key === 'Escape') {
-                const currentPage = document.querySelector('.page.active');
-                if (currentPage) {
-                    const pageId = currentPage.id;
-                    switch(pageId) {
-                        case 'pageRegister':
-                        case 'pageAttendance':
-                        case 'pageSuccess':
-                            showPage('pageDashboard');
-                            break;
-                        case 'pageAdmin':
-                        case 'pageMembers':
-                        case 'pageAttendanceLog':
-                            if (currentUser) {
-                                showPage('pageDashboard');
-                            } else {
-                                showPage('page1');
-                            }
-                            break;
-                    }
-                }
-            }
-            
-            // Enter to submit forms
-            if (e.key === 'Enter') {
-                const activeElement = document.activeElement;
-                if (activeElement.id === 'phoneInput') {
-                    handleLogin();
-                } else if (activeElement.closest('#pageRegister')) {
-                    handleRegister();
-                } else if (activeElement.closest('#pageAttendance')) {
-                    submitAttendance();
-                }
-            }
-        });
-
-        // ===== MANIFEST GENERATION =====
-        function generateManifest() {
-            const manifest = {
-                "name": "Sanctuary Keepers Attendance System",
-                "short_name": "SK Attendance",
-                "description": "Attendance tracking for Sanctuary Keepers Unit - Winners Chapel Winnipeg",
-                "start_url": "/",
-                "display": "standalone",
-                "background_color": "#ffffff",
-                "theme_color": "#d32f2f",
-                "orientation": "portrait-primary",
-                "icons": [
-                    {
-                        "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><circle cx='96' cy='96' r='86' fill='%23d32f2f'/><text x='96' y='125' text-anchor='middle' fill='white' font-size='80' font-family='Arial'>A</text></svg>",
-                        "sizes": "192x192",
-                        "type": "image/svg+xml",
-                        "purpose": "any maskable"
-                    },
-                    {
-                        "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><circle cx='256' cy='256' r='230' fill='%23d32f2f'/><text x='256' y='320' text-anchor='middle' fill='white' font-size='200' font-family='Arial'>A</text></svg>",
-                        "sizes": "512x512", 
-                        "type": "image/svg+xml",
-                        "purpose": "any maskable"
-                    }
-                ],
-                "categories": ["productivity", "business"],
-                "lang": "en",
-                "scope": "/",
-                "screenshots": []
-            };
-            
-            const manifestBlob = new Blob([JSON.stringify(manifest, null, 2)], {
-                type: 'application/json'
-            });
-            
-            const manifestURL = URL.createObjectURL(manifestBlob);
-            
-            // Create and append manifest link
-            const manifestLink = document.createElement('link');
-            manifestLink.rel = 'manifest';
-            manifestLink.href = manifestURL;
-            document.head.appendChild(manifestLink);
-        }
-
-        // ===== START APPLICATION =====
-        document.addEventListener('DOMContentLoaded', function() {
-            generateManifest();
-            initializeApp();
-        });
-
-        // ===== GLOBAL FUNCTIONS (accessible from HTML onclick) =====
-        window.setLanguage = setLanguage;
-        window.showPage = showPage;
-        window.handleLogin = handleLogin;
-        window.handleRegister = handleRegister;
-        window.logout = logout;
-        window.showAttendancePage = showAttendancePage;
-        window.submitAttendance = submitAttendance;
-        window.showAdminPanel = showAdminPanel;
-        window.showMembersPage = showMembersPage;
-        window.filterMembers = filterMembers;
-        window.showAttendanceLog = showAttendanceLog;
-        window.installApp = installApp;
-        window.dismissInstall = dismissInstall;
-
-        console.log('🎯 PWA Attendance System Ready!');
-    </script>
+  </div>
+
+  <!-- LOADING OVERLAY -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loading-text">Loading...</div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast" id="toast"></div>
+const manifest = {
+        "name": "Sanctuary Keepers Attendance System",
+        "short_name": "SK Attendance",
+        "description": "Attendance tracking for Sanctuary Keepers Unit - Winners Chapel Winnipeg",
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#667eea",
+        "theme_color": "#d32f2f",
+        "orientation": "portrait-primary",
+        "icons": [
+          {
+            "src": "https://raw.githubusercontent.com/yourusername/church-assets/main/logo.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+          },
+          {
+            "src": "https://raw.githubusercontent.com/yourusername/church-assets/main/logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+          }
+        ],
+        "categories": ["productivity", "business", "lifestyle"],
+        "lang": "en",
+        "scope": "/",
+        "screenshots": []
+      };
+      
+      const manifestBlob = new Blob([JSON.stringify(manifest, null, 2)], {
+        type: 'application/json'
+      });
+      
+      const manifestURL = URL.createObjectURL(manifestBlob);
+      const manifestLink = document.createElement('link');
+      manifestLink.rel = 'manifest';
+      manifestLink.href = manifestURL;
+      document.head.appendChild(manifestLink);
+    }
+
+    // ===== APP INITIALIZATION =====
+    function initializeApp() {
+      console.log('🚀 Initializing Modern PWA Attendance System...');
+      loadChurchLogos();
+      generateManifest();
+      const savedLanguage = localStorage.getItem('attendanceApp_language') || 'en';
+      setLanguage(savedLanguage);
+      initializeForms();
+      setupDemoData();
+      const savedUser = loadUser();
+      if (savedUser) {
+        updateDashboard();
+        showPage('dashboardPage');
+        updateStatus('Session restored', 'online');
+        console.log('✅ User session restored');
+      } else {
+        showPage('loginPage');
+        updateStatus('Ready to login', 'online');
+        console.log('ℹ️ No existing session - showing login');
+      }
+      console.log('✅ Modern PWA Attendance System Ready!');
+    }
+
+    // ===== START APPLICATION =====
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeApp();
+    });
+
+    // ===== GLOBAL FUNCTIONS =====
+    window.setLanguage = setLanguage;
+    window.showPage = showPage;
+    window.handleLogin = handleLogin;
+    window.handleRegister = handleRegister;
+    window.logout = logout;
+    window.showAttendancePage = showAttendancePage;
+    window.submitAttendance = submitAttendance;
+    window.showAdminPanel = showAdminPanel;
+    window.showMembersPage = showMembersPage;
+    window.showAttendanceLog = showAttendanceLog;
+
+    console.log('✅ Modern PWA Attendance System Loaded!');
+  </script>
 </body>
 </html>
